@@ -1,4 +1,4 @@
->>This is a small api collection which scraped the highlights on latest news from Deshaya, Lankadeepa and BBC Sinhala.
+>>This is a small api collection which scrapes the highlights on latest news from Deshaya, Lankadeepa and BBC Sinhala.
 >
 >>I hereby donot take any resonsibility for any issue or any faliure on the use of this api and also the ownership of the scraped data goes to the rightful owners.
 >
