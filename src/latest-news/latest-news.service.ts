@@ -120,4 +120,43 @@ export class LatestNewsService {
       throw error; // Propagate error up
     }
   }
+
+  async latestBBCSinhala() {
+    try {
+        const response = await axios.get(
+            `https://www.bbc.com/sinhala/topics/cg7267dz901t`,
+        );
+        const html = response.data;
+        const $ = cheerio.load(html);
+        
+        const titles = [];
+        const sources = [];
+        const dates = [];
+        
+        $('.bbc-6e44zt.e47bds20').each((index, element) => {
+            const title = $(element).text();
+            titles.push(title);
+            
+            // Extracting href from <a> tag inside the element
+            const href = $(element).find('a').attr('href');
+            sources.push(href);
+        });
+
+        $('.promo-timestamp.bbc-11oryzm.e1mklfmt0').each((index, element) => {
+            dates.push($(element).text());
+        });
+
+        const news = titles.map((title, index) => ({
+            title,
+            source: sources[index],
+            date: dates[index]
+        }));
+
+        return news;
+    } catch (error) {
+        console.error("Error:", error);
+        return [];
+    }
+}
+
 }

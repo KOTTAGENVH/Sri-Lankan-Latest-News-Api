@@ -27,4 +27,16 @@ export class LatestNewsController {
      return { error: 'Error fetching latest news' };
    }
  }
+
+  //Get BBC Sinhala News
+  @Get('bbcsinhala')
+  async findBBCSinhala() {
+    try {
+      const latestContent = await this.latestNewsService.latestBBCSinhala();
+      return { latestContent };
+    } catch (error) {
+      return { error: 'Error fetching latest news' };
+    }
+  }
+
 }
