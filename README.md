@@ -1,8 +1,10 @@
->>This is a small api collection which scrapes the highlights on latest news from Deshaya, Lankadeepa and BBC Sinhala.
+>>This is a api collection which scrapes the highlights on latest news from Deshaya, Lankadeepa and BBC Sinhala.
 >
 >>I hereby donot take any resonsibility for any issue or any faliure on the use of this api and also the ownership of the scraped data goes to the rightful owners.
 >
 >>Rapid Api Link: https://rapidapi.com/KOTTAGENVH/api/latest-sri-lankan-news
+>
+>> Visit my portfolio: https://www.nowenkottage.com
 >
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
