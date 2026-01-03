@@ -157,7 +157,7 @@ export class LatestNewsService {
         descriptions.push($(element).text().trim());
       });
 
-       $('.sec-1-ite-com').each((index, element) => {
+      $('.sec-1-ite-com').each((index, element) => {
         times.push($(element).text().trim());
       });
 
@@ -170,7 +170,7 @@ export class LatestNewsService {
           title,
           description: descriptions[index],
           source: sources[index],
-          time: times[index]
+          time: times[index],
         }));
         await this.cache.set(key, result, 60_000); // 60 seconds
         return result;
@@ -185,37 +185,48 @@ export class LatestNewsService {
     }
   }
 
-  async latestBBCSinhala() {
+  async latestBBCSinhala(page: number) {
     try {
+      const key = `latest-news:bbcSinhala:${page}`;
+      const cached = await this.cache.get(key);
+      if (cached) {
+        return cached;
+      }
       const response = await axios.get(
-        `https://www.bbc.com/sinhala/topics/cg7267dz901t`,
+        `https://www.bbc.com/sinhala/topics/cg7267dz901t?page=${page}`,
       );
+
       const html = response.data;
       const $ = cheerio.load(html);
 
-      const titles = [];
-      const sources = [];
-      const dates = [];
+      const news = [];
 
-      $('.bbc-6e44zt.e47bds20').each((index, element) => {
-        const title = $(element).text();
-        titles.push(title);
+      $('li.bbc-psvf5b').each((_, item) => {
+        const el = $(item);
 
-        // Extracting href from <a> tag inside the element
-        const href = $(element).find('a').attr('href');
-        sources.push(href);
+        const title = el.find('h2 a span[role="text"]').first().text().trim();
+        const source = el.find('h2 a').attr('href') || null;
+
+        const image =
+          el.find('img').attr('src') ||
+          el.find('img').attr('srcset')?.split(' ')[0] ||
+          null;
+
+        const timeEl = el.find('time.promo-timestamp');
+        const dateText = timeEl.text().trim();
+        const dateISO = timeEl.attr('datetime') || null;
+
+        if (title && source) {
+          news.push({
+            title,
+            source,
+            image,
+            date: dateText,
+            dateISO,
+          });
+        }
       });
-
-      $('.promo-timestamp.bbc-11oryzm.e1mklfmt0').each((index, element) => {
-        dates.push($(element).text());
-      });
-
-      const news = titles.map((title, index) => ({
-        title,
-        source: sources[index],
-        date: dates[index],
-      }));
-
+      await this.cache.set(key, news, 60_000); // 60 seconds
       return news;
     } catch (error) {
       console.error('Error:', error);
