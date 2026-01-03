@@ -3,6 +3,7 @@ import * as cheerio from 'cheerio';
 import axios, { AxiosResponse } from 'axios';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
+import { cleanText } from 'src/helper/cleanText';
 
 @Injectable()
 export class LatestNewsService {
@@ -236,35 +237,274 @@ export class LatestNewsService {
 
   async latestNewsFirstTamil() {
     try {
-      const response = await axios.get(`https://tamil.newsfirst.lk/`);
-      const html = response.data;
+      const key = `latest-news:newsFirstTamil`;
+      const cached = await this.cache.get(key);
+      if (cached) {
+        return cached;
+      }
+      const response = await axios.get('https://tamil.newsfirst.lk/');
+      const $ = cheerio.load(response.data);
+
+      const latest = [];
+      const breaking = [];
+      const breaking_latest = [];
+      const archive = [];
+      $('.latest_news_main_div').each((_, el) => {
+        const item = $(el);
+        latest.push({
+          title: item.find('h4.sub_news_title').text().trim(),
+          source: item.find('a').attr('href') || null,
+          image: item.find('img.latest_news_img').attr('src') || null,
+          description: item.find('p.latest_news_detail').text().trim(),
+          date: item.find('.time_date').text().trim(),
+        });
+      });
+      $(
+        '.main_div.top_stories > .ng-star-inserted > a, .top_stories_sub_news a',
+      ).each((_, el) => {
+        const item = $(el);
+
+        breaking_latest.push({
+          title: item
+            .find('h1.top_stories_header, h2.top_stories_sub_title')
+            .first()
+            .text()
+            .trim(),
+
+          source: item.attr('href') || null,
+
+          image:
+            item.find('img.top_stories_img, img.sub_img').attr('src') || null,
+
+          description: item
+            .find('.top_stories_details, .top_stories_sub_title_detail')
+            .first()
+            .text()
+            .trim(),
+
+          date: item.find('.time_date').first().text().trim(),
+        });
+      });
+      $('.top_stories_main a, .top_stories_sub_news a').each((_, el) => {
+        const item = $(el);
+        breaking.push({
+          title: item
+            .find('h1, h2.top_stories_sub_title')
+            .first()
+            .text()
+            .trim(),
+          source: item.attr('href') || null,
+          image: item.find('img').attr('src') || null,
+          description: item
+            .find('.top_stories_details, .top_stories_sub_title_detail')
+            .text()
+            .trim(),
+          date: item.find('.time_date').text().trim(),
+        });
+      });
+      $('.featured_news_main a').each((_, el) => {
+        const item = $(el);
+        archive.push({
+          title: item.find('h4.sub_news_title').text().trim(),
+          source: item.attr('href') || null,
+          image: item.find('img').attr('src') || null,
+          description: item.find('.sub_news_detail_guest').text().trim(),
+          date: item.find('.time_date').text().trim(),
+        });
+      });
+      await this.cache.set(
+        key,
+        { latest, breaking_latest, breaking, archive },
+        60_000,
+      ); // 60 seconds
+      return { latest, breaking_latest, breaking, archive };
+    } catch (error) {
+      console.error(error);
+      return { latest: [], breaking: [], archive: [] };
+    }
+  }
+
+  async latestNewsWire() {
+    try {
+      const key = `latest-news:newsWire`;
+      const cached = await this.cache.get(key);
+      if (cached) {
+        return cached;
+      }
+      const response = await axios.get('https://www.newswire.lk/');
+      const $ = cheerio.load(response.data);
+
+      const latest = [];
+      const lead_story = [];
+      const trending = [];
+      const moreNews = [];
+      $('.content-block').each((_, el) => {
+        const item = $(el);
+        lead_story.push({
+          title: item.find('.content-block-title a').text().trim(),
+
+          source: item.find('.content-block-title a').attr('href') || null,
+
+          image: item.find('.entry-featured-img-wrap img').attr('src') || null,
+        });
+      });
+      $('#hootkit-posts-list-5 .posts-listunit').each((_, el) => {
+        const item = $(el);
+        latest.push({
+          title: item.find('.posts-listunit-title a').text().trim(),
+
+          source: item.find('.posts-listunit-title a').attr('href') || null,
+
+          image: item.find('.posts-listunit-image img').attr('src') || null,
+
+          date: item.find('time.entry-published').text().trim(),
+
+          datetime: item.find('time.entry-published').attr('datetime') || null,
+        });
+      });
+      $('#hootkit-posts-grid-1 .post-gridunit').each((_, el) => {
+        const item = $(el);
+        trending.push({
+          title: item.find('.post-gridunit-title').text().trim(),
+          source: item.find('.post-gridunit-title a').attr('href') || null,
+          image: item.find('.post-gridunit-img').attr('src') || null,
+        });
+      });
+      $('#super_rss_reader-10 .srr-item').each((_, el) => {
+        const item = $(el);
+
+        moreNews.push({
+          title: item.find('.srr-title a').text().trim(),
+
+          source: item.find('.srr-title a').attr('href') || null,
+
+          image: item.find('.srr-thumb img').attr('src') || null,
+
+          description: item.find('.srr-summary p').text().trim(),
+
+          date: item.find('time.srr-date').text().trim(),
+
+          datetime: item.find('time.srr-date').attr('title') || null,
+        });
+      });
+      await this.cache.set(
+        key,
+        { lead_story, latest, trending, moreNews },
+        60_000,
+      ); // 60 seconds
+      return { lead_story, latest, trending, moreNews };
+    } catch (error) {
+      console.error(error);
+      return { lead_story: [], latest: [], trending: [], moreNews: [] };
+    }
+  }
+
+  async latestAdaDerana() {
+    try {
+      const key = `latest-news:adaDerana`;
+      const cached = await this.cache.get(key);
+      if (cached) {
+        return cached;
+      }
+      const response = await axios.get('https://www.adaderana.lk/', {
+        responseType: 'arraybuffer',
+      });
+      const html = Buffer.from(response.data, 'binary').toString('utf8');
       const $ = cheerio.load(html);
 
-      const titles = [];
-      const sources = [];
-      const descriptions = [];
-      $('.jeg_post_title').each((index, element) => {
-        const title = $(element).text().trim();
-        titles.push(title);
-        const href = $(element).find('a').attr('href');
-        sources.push(href);
+      const lead_story = [];
+      const hot_news = [];
+      const technology = [];
+      const entertainment = [];
+      $('.top-story .news-story').each((_, el) => {
+        const item = $(el);
+
+        lead_story.push({
+          title: cleanText(item.find('.story-text h3 a').text().trim()),
+
+          description: cleanText(item.find('.story-text p').text().trim()),
+
+          image: item.find('.thumb-image img').attr('src') || null,
+
+          source: item.find('.story-text h3 a').attr('href') || null,
+        });
       });
+      $('.wr-hot-news .hidden-xs .hot-news.news-story').each((_, el) => {
+        const item = $(el);
 
-      $('.jeg_post_excerpt').each((index, element) => {
-        const description = $(element).text().trim();
-        descriptions.push(description);
+        const link = item.find('.story-text h3 a').first();
+
+        hot_news.push({
+          title: cleanText(link.text()),
+
+          source: link.attr('href')
+            ? `https://www.adaderana.lk/${link.attr('href')}`
+            : null,
+
+          image: item.find('.thumb-image img').attr('src') || null,
+
+          description: cleanText(
+            item.find('.story-text p').first().text().trim(),
+          ),
+
+          time: item.find('.comments span').last().text().trim(),
+        });
       });
+      $('.news-section .technology.news-story').each((_, el) => {
+        const item = $(el);
 
-      const news = titles.map((title, index) => ({
-        title,
-        source: sources[index],
-        description: descriptions[index],
-      }));
+        const link = item.find('.story-text h3 a').first();
 
-      return news;
+        technology.push({
+          title: cleanText(link.text()),
+
+          source: link.attr('href')
+            ? `https://www.adaderana.lk/${link.attr('href')}`
+            : null,
+
+          image:
+            item.find('.lead-story-image img').attr('src') ||
+            item.find('.thumb-image img').attr('src') ||
+            null,
+
+          description: cleanText(
+            item.find('.story-text p.hidden-xs').first().text().trim(),
+          ),
+          date: item.find('.comments span').last().text().trim(),
+        });
+      });
+      $('.news-section.hidden-xs .entertainment.news-story').each((_, el) => {
+        const item = $(el);
+
+        const link = item.find('.story-text h3 a').first();
+
+        entertainment.push({
+          title: link.text().replace(/\s+/g, ' ').trim(),
+
+          source: link.attr('href')
+            ? `https://www.adaderana.lk/${link.attr('href')}`
+            : null,
+
+          image:
+            item.find('.lead-story-image img').attr('src') ||
+            item.find('.thumb-image img').attr('src') ||
+            null,
+
+          description: cleanText(
+            item.find('.story-text p.hidden-xs').first().text().trim(),
+          ),
+          date: item.find('.comments span').last().text().trim(),
+        });
+      });
+      await this.cache.set(
+        key,
+        { lead_story, hot_news, technology, entertainment },
+        60_000,
+      ); // 60 seconds
+      return { lead_story, hot_news, technology, entertainment };
     } catch (error) {
-      console.error('Error:', error);
-      return [];
+      console.error(error);
+      return { lead_story: [], latest: [], trending: [], moreNews: [] };
     }
   }
 }
