@@ -1,0 +1,35 @@
+name: Run News Cron Jobs
+
+on:
+  schedule:
+    - cron: "30 18 * * *" # 18:30 UTC = 12:00 AM IST
+  workflow_dispatch:
+
+jobs:
+  run-crons:
+    runs-on: ubuntu-latest
+
+    env:
+      API_KEY: ${{ secrets.API_KEY }}
+
+    steps:
+      - name: Run Lankadeepa Cron
+        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/lankadeepa?cron_secret=$API_KEY"
+
+      - name: Run Deshaya Cron
+        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/deshaya?cron_secret=$API_KEY"
+
+      - name: Run BBC Sinhala Cron
+        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/bbcsinhala?cron_secret=$API_KEY"
+
+      - name: Run NewsWire Cron
+        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/newswire?cron_secret=$API_KEY"
+
+      - name: Run NewsFirst Tamil Cron
+        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/newsfirsttamil?cron_secret=$API_KEY"
+
+      - name: Run AdaDerana Cron
+        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/adaderana?cron_secret=$API_KEY"
+
+      - name: Run MongoDB Storage Cleanup
+        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/storageStatus?cron_secret=$API_KEY"
