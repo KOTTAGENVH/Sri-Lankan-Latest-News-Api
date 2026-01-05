@@ -180,6 +180,7 @@ export class CronJobService {
       });
     }
   }
+
   async callCronjobLankadeepa() {
     const result = await this.latestNewsService.latestLankadeepa(1, 1);
     await this.saveLankadeepa(result);
@@ -226,5 +227,62 @@ export class CronJobService {
 
     this.logger.log('AdaDerana Cron job completed');
     return { message: 'AdaDerana Cron job completed' };
+  }
+
+  async callCronjobMongoDB() {
+    const MAX_NEWS = 50_000;
+    const THRESHOLD = 0.7;
+    const DELETE_RATIO = 0.3;
+
+    const totalCount = await this.newsModel.estimatedDocumentCount();
+
+    const usageRatio = totalCount / MAX_NEWS;
+
+    this.logger.log(
+      `MongoDB usage: ${totalCount}/${MAX_NEWS} (${Math.round(
+        usageRatio * 100,
+      )}%)`,
+    );
+
+    if (usageRatio < THRESHOLD) {
+      this.logger.log('MongoDB cleanup not required');
+      return {
+        status: 'ok',
+        message: 'Below threshold, no cleanup needed',
+      };
+    }
+
+    const deleteCount = Math.floor(MAX_NEWS * DELETE_RATIO);
+
+    this.logger.warn(
+      `MongoDB usage exceeded threshold. Deleting ${deleteCount} oldest documents`,
+    );
+
+    const idsToDelete = await this.newsModel
+      .find({}, { _id: 1 })
+      .sort({ fetchedAt: 1 }) // oldest first
+      .limit(deleteCount)
+      .lean()
+      .exec();
+
+    const deleteIds = idsToDelete.map((d) => d._id);
+
+    if (deleteIds.length === 0) {
+      this.logger.warn('No documents found to delete');
+      return;
+    }
+
+    const result = await this.newsModel.deleteMany({
+      _id: { $in: deleteIds },
+    });
+
+    this.logger.warn(
+      `MongoDB cleanup completed. Deleted ${result.deletedCount} documents`,
+    );
+
+    return {
+      status: 'cleaned',
+      deleted: result.deletedCount,
+    };
   }
 }

@@ -36,4 +36,9 @@ export class CronJobController {
   callCronJobNewsFirstTamil() {
     return this.cronJobService.callCronjobNewsFirstTamil();
   }
+
+  @Get('/storageStatus')
+  callCronJobMongoStorageStatus() {
+    return this.cronJobService.callCronjobMongoDB();
+  }
 }
