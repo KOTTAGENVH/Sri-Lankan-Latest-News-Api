@@ -12,5 +12,31 @@
       "dest": "src/main.ts",
       "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
     }
+  ],
+  "crons": [
+    {
+      "path": "/cronjob/v1/lankadeepa",
+      "schedule": "30 12 * * *"
+    },
+    {
+      "path": "/cronjob/v1/deshaya",
+      "schedule": "50 12 * * *"
+    },
+    {
+      "path": "/cronjob/v1/bbcsinhala",
+      "schedule": "10 13 * * *"
+    },
+    {
+      "path": "/cronjob/v1/newswire",
+      "schedule": "30 13 * * *"
+    },
+    {
+      "path": "/cronjob/v1/newsfirsttamil",
+      "schedule": "50 13 * * *"
+    },
+    {
+      "path": "/cronjob/v1/adaderana",
+      "schedule": "10 14 * * *"
+    }
   ]
 }

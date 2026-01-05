@@ -1,5 +1,3 @@
-// not-found.filter.ts
-
 import { ExceptionFilter, Catch, NotFoundException } from '@nestjs/common';
 import { HttpException, ArgumentsHost } from '@nestjs/common';
 import { Request, Response } from 'express';
@@ -11,7 +9,6 @@ export class NotFoundFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    // Customize your error response here
     response.status(404).json({
       statusCode: 404,
       message: 'Resource Not Found',

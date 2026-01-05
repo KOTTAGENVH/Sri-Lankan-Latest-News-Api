@@ -1,18 +1,26 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as cheerio from 'cheerio';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import { cleanText } from 'src/helper/cleanText';
+import {
+  BBCSinhalaArticle,
+  DeshayaArticle,
+  LankadeepaArticle,
+} from './interfaces';
 
 @Injectable()
 export class LatestNewsService {
   constructor(@Inject(CACHE_MANAGER) private cache: Cache) {}
 
-  async latestLankadeepa(page: number, section?: number) {
+  async latestLankadeepa(
+    page: number,
+    section?: number,
+  ): Promise<LankadeepaArticle[]> {
     try {
       const key = `latest-news:lankadeepa:${page}:${section ?? ''}`;
-      const cached = await this.cache.get(key);
+      const cached = await this.cache.get<LankadeepaArticle[]>(key);
       if (cached) {
         return cached;
       }
@@ -20,10 +28,10 @@ export class LatestNewsService {
         section
           ? `https://www.lankadeepa.lk/latest_news/${page}/${section}`
           : `https://www.lankadeepa.lk/latest_news/${page}`,
+        { timeout: 8000 },
       );
 
-      const html = response.data;
-      const $ = cheerio.load(html);
+      const $ = cheerio.load(response.data);
 
       const articles_lead = $(
         'section.category-page div.row article.cat-lead-story',
@@ -120,25 +128,26 @@ export class LatestNewsService {
       });
 
       if (result.length === 0 || !result) {
-        return 'No data found';
+        return [];
       }
       await this.cache.set(key, result, 60_000); // 60 seconds
       return result;
     } catch (error) {
       console.error('Error fetching data:', error);
-      return 'Error fetching data';
+      return [];
     }
   }
 
-  async latestDeshaya(page: number) {
+  async latestDeshaya(page: number): Promise<DeshayaArticle[]> {
     try {
       const key = `latest-news:deshaya:${page}`;
-      const cached = await this.cache.get(key);
+      const cached = await this.cache.get<DeshayaArticle[]>(key);
       if (cached) {
         return cached;
       }
       const response = await axios.get(
         `https://www.deshaya.lk/43/features/${page}`,
+        { timeout: 8000 },
       );
       const html = response.data;
       const $ = cheerio.load(html);
@@ -186,15 +195,16 @@ export class LatestNewsService {
     }
   }
 
-  async latestBBCSinhala(page: number) {
+  async latestBBCSinhala(page: number): Promise<BBCSinhalaArticle[]> {
     try {
       const key = `latest-news:bbcSinhala:${page}`;
-      const cached = await this.cache.get(key);
+      const cached = await this.cache.get<BBCSinhalaArticle[]>(key);
       if (cached) {
         return cached;
       }
       const response = await axios.get(
         `https://www.bbc.com/sinhala/topics/cg7267dz901t?page=${page}`,
+        { timeout: 8000 },
       );
 
       const html = response.data;
@@ -242,7 +252,9 @@ export class LatestNewsService {
       if (cached) {
         return cached;
       }
-      const response = await axios.get('https://tamil.newsfirst.lk/');
+      const response = await axios.get('https://tamil.newsfirst.lk/', {
+        timeout: 8000,
+      });
       const $ = cheerio.load(response.data);
 
       const latest = [];
@@ -331,7 +343,9 @@ export class LatestNewsService {
       if (cached) {
         return cached;
       }
-      const response = await axios.get('https://www.newswire.lk/');
+      const response = await axios.get('https://www.newswire.lk/', {
+        timeout: 8000,
+      });
       const $ = cheerio.load(response.data);
 
       const latest = [];
@@ -407,6 +421,7 @@ export class LatestNewsService {
         return cached;
       }
       const response = await axios.get('https://www.adaderana.lk/', {
+        timeout: 8000,
         responseType: 'arraybuffer',
       });
       const html = Buffer.from(response.data, 'binary').toString('utf8');

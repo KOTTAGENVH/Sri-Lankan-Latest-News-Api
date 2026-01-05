@@ -15,8 +15,8 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return "Latest Sri Lanka News is up and running! (No updates scheduled as of now)"', () => {
+      expect(appController.getHealth()).toBe('Latest Sri Lanka News is up and running! (No updates scheduled as of now)');
     });
   });
 });
