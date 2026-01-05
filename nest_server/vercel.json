@@ -15,53 +15,32 @@
   ],
   "crons": [
     {
-      "path": "/cronjob/v1/lankadeepa",
-      "schedule": "30 12 * * *",
-      "headers": {
-        "latest-news-api-key": "$API_KEY"
-      }
+      "path": "/cronjob/v1/lankadeepa?cron_secret=$API_KEY",
+      "schedule": "30 12 * * *"
     },
     {
-      "path": "/cronjob/v1/deshaya",
-      "schedule": "50 12 * * *",
-      "headers": {
-        "latest-news-api-key": "$API_KEY"
-      }
+      "path": "/cronjob/v1/deshaya?cron_secret=$API_KEY",
+      "schedule": "50 12 * * *"
     },
     {
-      "path": "/cronjob/v1/bbcsinhala",
-      "schedule": "10 13 * * *",
-      "headers": {
-        "latest-news-api-key": "$API_KEY"
-      }
+      "path": "/cronjob/v1/bbcsinhala?cron_secret=$API_KEY",
+      "schedule": "10 13 * * *"
     },
     {
-      "path": "/cronjob/v1/newswire",
-      "schedule": "30 13 * * *",
-      "headers": {
-        "latest-news-api-key": "$API_KEY"
-      }
+      "path": "/cronjob/v1/newswire?cron_secret=$API_KEY",
+      "schedule": "30 13 * * *"
     },
     {
-      "path": "/cronjob/v1/newsfirsttamil",
-      "schedule": "50 13 * * *",
-      "headers": {
-        "latest-news-api-key": "$API_KEY"
-      }
+      "path": "/cronjob/v1/newsfirsttamil?cron_secret=$API_KEY",
+      "schedule": "50 13 * * *"
     },
     {
-      "path": "/cronjob/v1/adaderana",
-      "schedule": "10 14 * * *",
-      "headers": {
-        "latest-news-api-key": "$API_KEY"
-      }
+      "path": "/cronjob/v1/adaderana?cron_secret=$API_KEY",
+      "schedule": "10 14 * * *"
     },
     {
-      "path": "/cronjob/v1/storageStatus",
-      "schedule": "30 14 * * *",
-      "headers": {
-        "latest-news-api-key": "$API_KEY"
-      }
+      "path": "/cronjob/v1/storageStatus?cron_secret=$API_KEY",
+      "schedule": "30 14 * * *"
     }
   ]
 }
