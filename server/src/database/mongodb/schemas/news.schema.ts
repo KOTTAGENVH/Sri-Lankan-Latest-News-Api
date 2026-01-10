@@ -14,6 +14,9 @@ export class News {
   @Prop()
   description?: string;
 
+  @Prop({ type: [Number], select: false })
+  plot_embedding?: number[];
+
   @Prop({ type: Date, index: true })
   publishedAt?: Date;
 

@@ -3,16 +3,17 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LatestNewsModule } from './latest-news/latest_news.module';
 import { NotFoundFilter } from './not-found-filter';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { CacheModule } from '@nestjs/cache-manager';
 import { HistoryModule } from './history/history.module';
 import { CronJobModule } from './cron_job/cron_job.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/disabled';
+import { CustomThrottlerGuard } from './throtler.guard';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/dis
       autoSchemaFile: true,
       playground: process.env.NODE_ENV !== 'production',
       introspection: process.env.NODE_ENV !== 'production',
+      context: ({ req, res }) => ({ req, res }),
       plugins:
         process.env.NODE_ENV === 'production'
           ? [ApolloServerPluginLandingPageDisabled()]
@@ -65,7 +67,7 @@ import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/dis
     }),
     LatestNewsModule,
     HistoryModule,
-    CronJobModule,
+    CronJobModule
   ],
   controllers: [AppController],
   providers: [
@@ -75,7 +77,7 @@ import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/dis
     },
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: CustomThrottlerGuard,
     },
     AppService,
   ],
