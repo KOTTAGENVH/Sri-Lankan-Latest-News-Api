@@ -16,14 +16,12 @@ export class ApiKeyGuard implements CanActivate {
       request.headers['authorization'];
 
     // Query parameter based auth (Vercel cron)
-    const cronSecret = request.query?.cron_secret;
-
+    const cronSecret =
+      request.query?.cron_secret ?? request.query?.['cron_secret'];
     const isApiKeyValid =
-      apiKey && apiKey === process.env.API_KEY;
-
+      typeof apiKey === 'string' && apiKey === process.env.API_KEY;
     const isCronKeyValid =
-      cronSecret && cronSecret === process.env.CRON_SECRET;
-
+      typeof cronSecret === 'string' && cronSecret === process.env.CRON_SECRET;
     if (!isApiKeyValid && !isCronKeyValid) {
       throw new UnauthorizedException('Invalid API key');
     }
