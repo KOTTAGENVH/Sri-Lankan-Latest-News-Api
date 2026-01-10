@@ -1,6 +1,6 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { CronJobService } from './cron_job.service';
-import { ApiKeyGuard } from 'src/helper/api_guard';
+import { ApiKeyGuard } from '../helper/api_guard';
 
 @UseGuards(ApiKeyGuard)
 @Controller('cronjob/v1')

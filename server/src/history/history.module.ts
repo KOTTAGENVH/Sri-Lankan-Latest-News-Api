@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { HistoryService } from './history.service';
 import { HistoryResolver } from './history.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
-import { News, NewsSchema } from 'src/database/mongodb/schemas/news.schema';
+import { News, NewsSchema } from '../database/mongodb/schemas/news.schema';
 
 @Module({
   imports: [
