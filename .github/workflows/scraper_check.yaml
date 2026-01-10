@@ -12,30 +12,72 @@ jobs:
     steps:
       - name: Check Lankadeepa
         run: |
-          curl -f -s https://lankanewsapi.nowenkottage.com/lankadepa/v1/1/1 \
-          | jq -e '   (.latestContent.lead_story | length > 0) or   (.latestContent.latest | length > 0) or  (.latestContent.trending | length > 0) or   (.latestContent.moreNews | length > 0)'
+          curl -fs https://lankanewsapi.nowenkottage.com/lankadepa/v1/1/1 \
+          | jq -e '
+            (
+              (.latestContent.lead_story // [] | length) +
+              (.latestContent.latest // [] | length) +
+              (.latestContent.trending // [] | length) +
+              (.latestContent.moreNews // [] | length)
+            ) > 0
+          '
 
       - name: Check Deshaya
         run: |
-          curl -f -s https://lankanewsapi.nowenkottage.com/deshaya/v1/1 \
-          | jq -e '   (.latestContent.lead_story | length > 0) or   (.latestContent.latest | length > 0) or  (.latestContent.trending | length > 0) or   (.latestContent.moreNews | length > 0)'
+          curl -fs https://lankanewsapi.nowenkottage.com/deshaya/v1/1 \
+          | jq -e '
+            (
+              (.latestContent.lead_story // [] | length) +
+              (.latestContent.latest // [] | length) +
+              (.latestContent.trending // [] | length) +
+              (.latestContent.moreNews // [] | length)
+            ) > 0
+          '
 
       - name: Check BBC Sinhala
         run: |
-          curl -f -s https://lankanewsapi.nowenkottage.com/bbcsinhala/v1/3 \
-          | jq -e '   (.latestContent.lead_story | length > 0) or   (.latestContent.latest | length > 0) or  (.latestContent.trending | length > 0) or   (.latestContent.moreNews | length > 0)'
+          curl -fs https://lankanewsapi.nowenkottage.com/bbcsinhala/v1/3 \
+          | jq -e '
+            (
+              (.latestContent.lead_story // [] | length) +
+              (.latestContent.latest // [] | length) +
+              (.latestContent.trending // [] | length) +
+              (.latestContent.moreNews // [] | length)
+            ) > 0
+          '
 
       - name: Check NewsFirst Tamil
         run: |
-          curl -f -s https://lankanewsapi.nowenkottage.com/newsfirsttamil/v1 \
-          | jq -e '   (.latestContent.lead_story | length > 0) or   (.latestContent.latest | length > 0) or  (.latestContent.trending | length > 0) or   (.latestContent.moreNews | length > 0)'
+          curl -fs https://lankanewsapi.nowenkottage.com/newsfirsttamil/v1 \
+          | jq -e '
+            (
+              (.latestContent.lead_story // [] | length) +
+              (.latestContent.latest // [] | length) +
+              (.latestContent.trending // [] | length) +
+              (.latestContent.moreNews // [] | length)
+            ) > 0
+          '
 
       - name: Check NewsWire
         run: |
-          curl -f -s https://lankanewsapi.nowenkottage.com/latest-news/newswire/v1 \
-          | jq -e '   (.latestContent.lead_story | length > 0) or   (.latestContent.latest | length > 0) or  (.latestContent.trending | length > 0) or   (.latestContent.moreNews | length > 0)'
+          curl -fs https://lankanewsapi.nowenkottage.com/latest-news/newswire/v1 \
+          | jq -e '
+            (
+              (.latestContent.lead_story // [] | length) +
+              (.latestContent.latest // [] | length) +
+              (.latestContent.trending // [] | length) +
+              (.latestContent.moreNews // [] | length)
+            ) > 0
+          '
 
       - name: Check AdaDerana
         run: |
-          curl -f -s https://lankanewsapi.nowenkottage.com/latest-news/adaderana/v1 \
-          | jq -e '   (.latestContent.lead_story | length > 0) or   (.latestContent.latest | length > 0) or  (.latestContent.trending | length > 0) or   (.latestContent.moreNews | length > 0)'
+          curl -fs https://lankanewsapi.nowenkottage.com/latest-news/adaderana/v1 \
+          | jq -e '
+            (
+              (.latestContent.lead_story // [] | length) +
+              (.latestContent.latest // [] | length) +
+              (.latestContent.trending // [] | length) +
+              (.latestContent.moreNews // [] | length)
+            ) > 0
+          '
