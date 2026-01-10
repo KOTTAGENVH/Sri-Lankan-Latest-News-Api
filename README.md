@@ -1,6 +1,9 @@
 # 🇱🇰 Latest Sri Lanka News API
 
-![lankaNews](https://github.com/user-attachments/assets/7443e30b-944e-4700-ac11-0f120ff1a45d)
+<img src="https://github.com/user-attachments/assets/7443e30b-944e-4700-ac11-0f120ff1a45d"
+     alt="lankaNews"
+     width="100"
+     height="100">
 
 ![Cron Health Check](https://github.com/KOTTAGENVH/Sri-Lankan-Latest-News-Api/actions/workflows/cronjobs.yaml/badge.svg)
 ![Scraper Health Check](https://github.com/KOTTAGENVH/Sri-Lankan-Latest-News-Api/actions/workflows/scraper_check.yaml/badge.svg)
