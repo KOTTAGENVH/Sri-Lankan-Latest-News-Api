@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { News, NewsDocument } from 'src/database/mongodb/schemas/news.schema';
+import { News, NewsDocument } from '../database/mongodb/schemas/news.schema';
 import { Cache } from 'cache-manager';
 import axios from 'axios';
 

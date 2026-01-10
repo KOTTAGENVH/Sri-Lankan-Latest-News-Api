@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { createHash } from 'crypto';
 import { Model } from 'mongoose';
-import { News, NewsDocument } from 'src/database/mongodb/schemas/news.schema';
-import { LatestNewsService } from 'src/latest-news/latest_news.service';
+import { News, NewsDocument } from '../database/mongodb/schemas/news.schema';
+import { LatestNewsService } from '../latest-news/latest_news.service';
 
 @Injectable()
 export class CronJobService {
