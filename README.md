@@ -31,7 +31,7 @@ When **Version 1 (v1)** was originally launched, many leading Sri Lankan news ou
 ## 🚀 What’s New in Latest Sri Lanka News API — v2
 
 ### 🔹 Improved Performance
-- Introduced **server-side caching** (even on a serverless Vercel environment) to help reduce latency and improve response times.
+- Introduced **server-side caching** to help reduce latency and improve response times.
 
 ### 🔹 API Versioning
 - Clear **API versioning** for better maintainability and long-term backward compatibility.
