@@ -3,7 +3,7 @@ import * as cheerio from 'cheerio';
 import axios from 'axios';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
-import { cleanText } from 'src/helper/cleanText';
+import { cleanText } from '../helper/cleanText';
 import {
   BBCSinhalaArticle,
   DeshayaArticle,
