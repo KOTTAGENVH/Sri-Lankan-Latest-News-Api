@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Check Lankadeepa
         run: |
-          curl -fs https://lankanewsapi.nowenkottage.com/lankadepa/v1/1/1 \
+          curl -fs https://lankanewsapi.nowenkottage.com/latest-news/lankadepa/v1/1/1 \
           | jq -e '
             (
               (.latestContent.lead_story // [] | length) or
@@ -24,7 +24,7 @@ jobs:
 
       - name: Check Deshaya
         run: |
-          curl -fs https://lankanewsapi.nowenkottage.com/deshaya/v1/1 \
+          curl -fs https://lankanewsapi.nowenkottage.com/latest-news/deshaya/v1/1 \
           | jq -e '
             (
               (.latestContent.lead_story // [] | length) or
@@ -36,7 +36,7 @@ jobs:
 
       - name: Check BBC Sinhala
         run: |
-          curl -fs https://lankanewsapi.nowenkottage.com/bbcsinhala/v1/3 \
+          curl -fs https://lankanewsapi.nowenkottage.com/latest-news/bbcsinhala/v1/3 \
           | jq -e '
             (
               (.latestContent.lead_story // [] | length) or
@@ -48,7 +48,7 @@ jobs:
 
       - name: Check NewsFirst Tamil
         run: |
-          curl -fs https://lankanewsapi.nowenkottage.com/newsfirsttamil/v1 \
+          curl -fs https://lankanewsapi.nowenkottage.com/latest-news/newsfirsttamil/v1 \
           | jq -e '
             (
               (.latestContent.lead_story // [] | length) or
