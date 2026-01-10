@@ -15,9 +15,9 @@ jobs:
           curl -fs https://lankanewsapi.nowenkottage.com/lankadepa/v1/1/1 \
           | jq -e '
             (
-              (.latestContent.lead_story // [] | length) +
-              (.latestContent.latest // [] | length) +
-              (.latestContent.trending // [] | length) +
+              (.latestContent.lead_story // [] | length) or
+              (.latestContent.latest // [] | length) or
+              (.latestContent.trending // [] | length) or
               (.latestContent.moreNews // [] | length)
             ) > 0
           '
@@ -27,9 +27,9 @@ jobs:
           curl -fs https://lankanewsapi.nowenkottage.com/deshaya/v1/1 \
           | jq -e '
             (
-              (.latestContent.lead_story // [] | length) +
-              (.latestContent.latest // [] | length) +
-              (.latestContent.trending // [] | length) +
+              (.latestContent.lead_story // [] | length) or
+              (.latestContent.latest // [] | length) or
+              (.latestContent.trending // [] | length) or
               (.latestContent.moreNews // [] | length)
             ) > 0
           '
@@ -39,9 +39,9 @@ jobs:
           curl -fs https://lankanewsapi.nowenkottage.com/bbcsinhala/v1/3 \
           | jq -e '
             (
-              (.latestContent.lead_story // [] | length) +
-              (.latestContent.latest // [] | length) +
-              (.latestContent.trending // [] | length) +
+              (.latestContent.lead_story // [] | length) or
+              (.latestContent.latest // [] | length) or
+              (.latestContent.trending // [] | length) or
               (.latestContent.moreNews // [] | length)
             ) > 0
           '
@@ -51,9 +51,9 @@ jobs:
           curl -fs https://lankanewsapi.nowenkottage.com/newsfirsttamil/v1 \
           | jq -e '
             (
-              (.latestContent.lead_story // [] | length) +
-              (.latestContent.latest // [] | length) +
-              (.latestContent.trending // [] | length) +
+              (.latestContent.lead_story // [] | length) or
+              (.latestContent.latest // [] | length) or
+              (.latestContent.trending // [] | length) or
               (.latestContent.moreNews // [] | length)
             ) > 0
           '
@@ -63,9 +63,9 @@ jobs:
           curl -fs https://lankanewsapi.nowenkottage.com/latest-news/newswire/v1 \
           | jq -e '
             (
-              (.latestContent.lead_story // [] | length) +
-              (.latestContent.latest // [] | length) +
-              (.latestContent.trending // [] | length) +
+              (.latestContent.lead_story // [] | length) or
+              (.latestContent.latest // [] | length) or
+              (.latestContent.trending // [] | length) or
               (.latestContent.moreNews // [] | length)
             ) > 0
           '
@@ -75,9 +75,9 @@ jobs:
           curl -fs https://lankanewsapi.nowenkottage.com/latest-news/adaderana/v1 \
           | jq -e '
             (
-              (.latestContent.lead_story // [] | length) +
-              (.latestContent.latest // [] | length) +
-              (.latestContent.trending // [] | length) +
+              (.latestContent.lead_story // [] | length) or
+              (.latestContent.latest // [] | length) or
+              (.latestContent.trending // [] | length) or
               (.latestContent.moreNews // [] | length)
             ) > 0
           '
