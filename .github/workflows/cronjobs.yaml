@@ -10,26 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      API_KEY: ${{ secrets.API_KEY }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
 
     steps:
       - name: Run Lankadeepa Cron
-        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/lankadeepa?cron_secret=$API_KEY"
+        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/lankadeepa?cron_secret=$CRON_SECRET"
 
       - name: Run Deshaya Cron
-        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/deshaya?cron_secret=$API_KEY"
+        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/deshaya?cron_secret=$CRON_SECRET"
 
       - name: Run BBC Sinhala Cron
-        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/bbcsinhala?cron_secret=$API_KEY"
+        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/bbcsinhala?cron_secret=$CRON_SECRET"
 
       - name: Run NewsWire Cron
-        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/newswire?cron_secret=$API_KEY"
+        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/newswire?cron_secret=$CRON_SECRET"
 
       - name: Run NewsFirst Tamil Cron
-        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/newsfirsttamil?cron_secret=$API_KEY"
+        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/newsfirsttamil?cron_secret=$CRON_SECRET"
 
       - name: Run AdaDerana Cron
-        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/adaderana?cron_secret=$API_KEY"
+        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/adaderana?cron_secret=$CRON_SECRET"
 
       - name: Run MongoDB Storage Cleanup
-        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/storageStatus?cron_secret=$API_KEY"
+        run: curl -fsS "https://lankanewsapi.nowenkottage.com/cronjob/v1/storageStatus?cron_secret=$CRON_SECRET"
