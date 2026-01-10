@@ -5,6 +5,11 @@ async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule);
     const port = 8223;
+    app.enableCors({
+      origin: '*', 
+      methods: ['GET', 'POST', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-RapidAPI-Key', 'API_KEY', 'EMBEDDING_API_KEY'],
+    });
     await app.listen(port);
     console.log(`Server is running on http://localhost:${port}`);
   } catch (error) {
