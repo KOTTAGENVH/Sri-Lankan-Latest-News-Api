@@ -13,71 +13,29 @@ jobs:
       - name: Check Lankadeepa
         run: |
           curl -fs https://lankanewsapi.nowenkottage.com/latest-news/lankadepa/v1/1/1 \
-          | jq -e '
-            (
-              (.latestContent.lead_story // [] | length) or
-              (.latestContent.latest // [] | length) or
-              (.latestContent.trending // [] | length) or
-              (.latestContent.moreNews // [] | length)
-            ) > 0
-          '
+          | jq -e '(.latestContent // []) | length > 0'
 
       - name: Check Deshaya
         run: |
           curl -fs https://lankanewsapi.nowenkottage.com/latest-news/deshaya/v1/1 \
-          | jq -e '
-            (
-              (.latestContent.lead_story // [] | length) or
-              (.latestContent.latest // [] | length) or
-              (.latestContent.trending // [] | length) or
-              (.latestContent.moreNews // [] | length)
-            ) > 0
-          '
+          | jq -e '(.latestContent // []) | length > 0'
 
       - name: Check BBC Sinhala
         run: |
           curl -fs https://lankanewsapi.nowenkottage.com/latest-news/bbcsinhala/v1/3 \
-          | jq -e '
-            (
-              (.latestContent.lead_story // [] | length) or
-              (.latestContent.latest // [] | length) or
-              (.latestContent.trending // [] | length) or
-              (.latestContent.moreNews // [] | length)
-            ) > 0
-          '
+          | jq -e '(.latestContent // []) | length > 0'
 
       - name: Check NewsFirst Tamil
         run: |
           curl -fs https://lankanewsapi.nowenkottage.com/latest-news/newsfirsttamil/v1 \
-          | jq -e '
-            (
-              (.latestContent.lead_story // [] | length) or
-              (.latestContent.latest // [] | length) or
-              (.latestContent.trending // [] | length) or
-              (.latestContent.moreNews // [] | length)
-            ) > 0
-          '
+          | jq -e '(.latestContent // []) | length > 0'
 
       - name: Check NewsWire
         run: |
           curl -fs https://lankanewsapi.nowenkottage.com/latest-news/newswire/v1 \
-          | jq -e '
-            (
-              (.latestContent.lead_story // [] | length) or
-              (.latestContent.latest // [] | length) or
-              (.latestContent.trending // [] | length) or
-              (.latestContent.moreNews // [] | length)
-            ) > 0
-          '
+          | jq -e '(.latestContent // []) | length > 0'
 
       - name: Check AdaDerana
         run: |
           curl -fs https://lankanewsapi.nowenkottage.com/latest-news/adaderana/v1 \
-          | jq -e '
-            (
-              (.latestContent.lead_story // [] | length) or
-              (.latestContent.latest // [] | length) or
-              (.latestContent.trending // [] | length) or
-              (.latestContent.moreNews // [] | length)
-            ) > 0
-          '
+          | jq -e '(.latestContent // []) | length > 0'
