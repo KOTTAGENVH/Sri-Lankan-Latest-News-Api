@@ -4,14 +4,13 @@ import {
   ArgumentsHost,
   NotFoundException,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
 
 @Catch(NotFoundException)
 export class NotFoundFilter implements ExceptionFilter {
   catch(exception: NotFoundException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const response = ctx.getResponse<any>();
+    const request = ctx.getRequest<any>();
 
     response.status(404).json({
       statusCode: 404,
