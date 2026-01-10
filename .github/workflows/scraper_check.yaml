@@ -1,0 +1,41 @@
+name: Scraper Health Check
+
+on:
+  schedule:
+    - cron: "30 18 * * *" # 18:30 UTC = 12:00 AM IST
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Lankadeepa
+        run: |
+          curl -f -s https://lankanewsapi.nowenkottage.com/lankadepa/v1/1/1 \
+          | jq -e '.latestContent | length > 0'
+
+      - name: Check Deshaya
+        run: |
+          curl -f -s https://lankanewsapi.nowenkottage.com/deshaya/v1/1 \
+          | jq -e '.latestContent | length > 0'
+
+      - name: Check BBC Sinhala
+        run: |
+          curl -f -s https://lankanewsapi.nowenkottage.com/bbcsinhala/v1/3 \
+          | jq -e '.latestContent | length > 0'
+
+      - name: Check NewsFirst Tamil
+        run: |
+          curl -f -s https://lankanewsapi.nowenkottage.com/newsfirsttamil/v1 \
+          | jq -e '.latestContent.latest | length > 0'
+
+      - name: Check NewsWire
+        run: |
+          curl -f -s https://lankanewsapi.nowenkottage.com/latest-news/newswire/v1 \
+          | jq -e '.latestContent.latest | length > 0'
+
+      - name: Check AdaDerana
+        run: |
+          curl -f -s https://lankanewsapi.nowenkottage.com/latest-news/adaderana/v1 \
+          | jq -e '.latestContent.lead_story | length > 0'
