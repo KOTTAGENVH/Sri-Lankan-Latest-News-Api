@@ -24,7 +24,7 @@ When **Version 0 (v0)** was originally launched, many leading Sri Lankan news ou
 ## ⚠️ Versioning & Deprecation Notice
 
 - **v0 (Legacy APIs)** will be **deprecated by the end of 2026**
-- Developers are **strongly encouraged to migrate to v2** for long-term support and improved performance
+- Developers are **strongly encouraged to migrate to v1** for long-term support and improved performance
 
 ---
 
