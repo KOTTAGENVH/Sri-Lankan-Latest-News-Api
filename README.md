@@ -23,12 +23,12 @@ When **Version 1 (v1)** was originally launched, many leading Sri Lankan news ou
 
 ## ⚠️ Versioning & Deprecation Notice
 
-- **v1 (Legacy APIs)** will be **deprecated by the end of 2026**
+- **v0 (Legacy APIs)** will be **deprecated by the end of 2026**
 - Developers are **strongly encouraged to migrate to v2** for long-term support and improved performance
 
 ---
 
-## 🚀 What’s New in Latest Sri Lanka News API — v2
+## 🚀 What’s New in Latest Sri Lanka News API — v1
 
 ### 🔹 Improved Performance
 - Introduced **server-side caching** to help reduce latency and improve response times.
