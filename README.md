@@ -10,7 +10,7 @@
 
 Latest Sri Lanka News API is a **developer-friendly API** that provides up-to-date news content scraped from major Sri Lankan news websites.
 
-When **Version 1 (v1)** was originally launched, many leading Sri Lankan news outlets did **not offer official public APIs**. This project was created to bridge that gap and make local news easily accessible to developers, startups, and researchers.
+When **Version 0 (v0)** was originally launched, many leading Sri Lankan news outlets did **not offer official public APIs**. This project was created to bridge that gap and make local news easily accessible to developers, startups, and researchers.
 
 ---
 
