@@ -17,7 +17,7 @@ When **Version 0 (v0)** was originally launched, many leading Sri Lankan news ou
 ## 📘 Documentation
 
 - **For detailed API usage and examples, please check rapidapi:**
-- https://rapidapi.com](https://rapidapi.com/KOTTAGENVH/api/latest-sri-lankan-news
+- https://rapidapi.com/KOTTAGENVH/api/latest-sri-lankan-news
 
 ---
 
