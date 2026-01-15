@@ -202,6 +202,7 @@ export class LatestNewsService {
       if (cached) {
         return cached;
       }
+
       const response = await axios.get(
         `https://www.bbc.com/sinhala/topics/cg7267dz901t?page=${page}`,
         { timeout: 8000 },
@@ -210,37 +211,53 @@ export class LatestNewsService {
       const html = response.data;
       const $ = cheerio.load(html);
 
-      const news = [];
+      const nextDataRaw = $('#__NEXT_DATA__').html();
+      if (!nextDataRaw) {
+        console.warn('BBC Sinhala: __NEXT_DATA__ not found');
+        return [];
+      }
+      const nextData = JSON.parse(nextDataRaw);
 
-      $('li.bbc-psvf5b').each((_, item) => {
-        const el = $(item);
+      const pageData = nextData?.props?.pageProps?.pageData;
+      if (!pageData) {
+        console.warn('BBC Sinhala: pageData missing');
+        return [];
+      }
 
-        const title = el.find('h2 a span[role="text"]').first().text().trim();
-        const source = el.find('h2 a').attr('href') || null;
+      const news: BBCSinhalaArticle[] = [];
 
-        const image =
-          el.find('img').attr('src') ||
-          el.find('img').attr('srcset')?.split(' ')[0] ||
-          null;
+      const curations = pageData?.curations ?? [];
 
-        const timeEl = el.find('time.promo-timestamp');
-        const dateText = timeEl.text().trim();
-        const dateISO = timeEl.attr('datetime') || null;
+      for (const curation of curations) {
+        const summaries = curation?.summaries ?? [];
 
-        if (title && source) {
-          news.push({
-            title,
-            source,
-            image,
-            date: dateText,
-            dateISO,
-          });
+        for (const item of summaries) {
+          if (item.type !== 'article') continue;
+
+          const title = item?.title?.trim();
+          const source = item?.link ?? null;
+
+          const image = item?.imageUrl
+            ? item.imageUrl.replace('{width}', '640')
+            : null;
+
+          const dateISO = item?.firstPublished ?? null;
+
+          if (title && source) {
+            news.push({
+              title,
+              source,
+              image,
+              dateISO,
+            });
+          }
         }
-      });
+      }
+
       await this.cache.set(key, news, 60_000); // 60 seconds
       return news;
     } catch (error) {
-      console.error('Error:', error);
+      console.error('BBC Sinhala scrape error:', error);
       return [];
     }
   }
