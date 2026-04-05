@@ -9,12 +9,15 @@
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
-    "incremental": true,
+    "rootDir": "./src",
+    "incremental": false, 
     "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
 }
