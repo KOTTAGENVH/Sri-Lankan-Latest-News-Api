@@ -11,7 +11,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { News, NewsDocument } from '../database/mongodb/schemas/news.schema';
 import { Cache } from 'cache-manager';
-import axios from 'axios';
 
 @Injectable()
 export class HistoryService {
@@ -123,21 +122,39 @@ export class HistoryService {
       if (cached) {
         return cached;
       }
-      const response = await axios.post(
-        'http://0.0.0.0:8000/embed/text',
-        {
-          text: text,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            embedding_news_api_key: process.env.EMBEDDING_API_KEY!,
-          },
-          timeout: 8000,
-        },
-      );
 
-      const embedding = response.data.embedding;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+      const response = await fetch('http://0.0.0.0:8000/embed/text', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          embedding_news_api_key: process.env.EMBEDDING_API_KEY!,
+        },
+        body: JSON.stringify({ text: text }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        let errorDetail;
+        try {
+          errorDetail = await response.json();
+        } catch (e) {
+          errorDetail = await response.text();
+        }
+
+        throw new BadGatewayException({
+          message: 'Embedding service error',
+          statusCode: response.status,
+          detail: errorDetail,
+        });
+      }
+
+      const responseData = await response.json();
+      const embedding = responseData.embedding;
 
       const agg = [
         {
@@ -172,22 +189,14 @@ export class HistoryService {
       await this.cache.set(key, result, 60 * 60);
       return result;
     } catch (error: any) {
-      if (axios.isAxiosError(error)) {
-        if (error.code === 'ECONNABORTED') {
-          throw new GatewayTimeoutException('Embedding service timed out');
-        }
-
-        if (error.response) {
-          throw new BadGatewayException({
-            message: 'Embedding service error',
-            statusCode: error.response.status,
-            detail: error.response.data,
-          });
-        }
-
-        if (error.request) {
-          throw new BadGatewayException('Embedding service unreachable');
-        }
+      if (error instanceof BadGatewayException) {
+        throw error;
+      }
+      if (error.name === 'AbortError') {
+        throw new GatewayTimeoutException('Embedding service timed out');
+      }
+      if (error instanceof TypeError) {
+        throw new BadGatewayException('Embedding service unreachable');
       }
 
       throw new InternalServerErrorException('Failed to generate embedding');
