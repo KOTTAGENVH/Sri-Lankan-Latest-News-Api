@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as cheerio from 'cheerio';
-import axios from 'axios';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import { cleanText } from '../helper/cleanText';
@@ -14,6 +13,28 @@ import {
 export class LatestNewsService {
   constructor(@Inject(CACHE_MANAGER) private cache: Cache) {}
 
+  //Helper
+  private async fetchWithTimeout(
+    url: string,
+    timeout = 8000,
+    asArrayBuffer = false,
+  ): Promise<string | ArrayBuffer> {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+      return asArrayBuffer
+        ? await response.arrayBuffer()
+        : await response.text();
+    } finally {
+      clearTimeout(id);
+    }
+  }
+
   async latestLankadeepa(
     page: number,
     section?: number,
@@ -24,14 +45,14 @@ export class LatestNewsService {
       if (cached) {
         return cached;
       }
-      const response = await axios.get(
-        section
-          ? `https://www.lankadeepa.lk/latest_news/${page}/${section}`
-          : `https://www.lankadeepa.lk/latest_news/${page}`,
-        { timeout: 8000 },
-      );
 
-      const $ = cheerio.load(response.data);
+      const url = section
+        ? `https://www.lankadeepa.lk/latest_news/${page}/${section}`
+        : `https://www.lankadeepa.lk/latest_news/${page}`;
+
+      const html = (await this.fetchWithTimeout(url)) as string;
+
+      const $ = cheerio.load(html);
 
       const articles_lead = $(
         'section.category-page div.row article.cat-lead-story',
@@ -145,11 +166,10 @@ export class LatestNewsService {
       if (cached) {
         return cached;
       }
-      const response = await axios.get(
+
+      const html = (await this.fetchWithTimeout(
         `https://www.deshaya.lk/43/features/${page}`,
-        { timeout: 8000 },
-      );
-      const html = response.data;
+      )) as string;
       const $ = cheerio.load(html);
 
       // Arrays to store extracted data
@@ -203,12 +223,9 @@ export class LatestNewsService {
         return cached;
       }
 
-      const response = await axios.get(
+      const html = (await this.fetchWithTimeout(
         `https://www.bbc.com/sinhala/topics/cg7267dz901t?page=${page}`,
-        { timeout: 8000 },
-      );
-
-      const html = response.data;
+      )) as string;
       const $ = cheerio.load(html);
 
       const nextDataRaw = $('#__NEXT_DATA__').html();
@@ -269,10 +286,11 @@ export class LatestNewsService {
       if (cached) {
         return cached;
       }
-      const response = await axios.get('https://tamil.newsfirst.lk/', {
-        timeout: 8000,
-      });
-      const $ = cheerio.load(response.data);
+
+      const html = (await this.fetchWithTimeout(
+        'https://tamil.newsfirst.lk/',
+      )) as string;
+      const $ = cheerio.load(html);
 
       const latest = [];
       const breaking = [];
@@ -360,10 +378,11 @@ export class LatestNewsService {
       if (cached) {
         return cached;
       }
-      const response = await axios.get('https://www.newswire.lk/', {
-        timeout: 8000,
-      });
-      const $ = cheerio.load(response.data);
+
+      const html = (await this.fetchWithTimeout(
+        'https://www.newswire.lk/',
+      )) as string;
+      const $ = cheerio.load(html);
 
       const latest = [];
       const lead_story = [];
@@ -437,11 +456,13 @@ export class LatestNewsService {
       if (cached) {
         return cached;
       }
-      const response = await axios.get('https://www.adaderana.lk/', {
-        timeout: 8000,
-        responseType: 'arraybuffer',
-      });
-      const html = Buffer.from(response.data, 'binary').toString('utf8');
+
+      const arrayBuffer = (await this.fetchWithTimeout(
+        'https://www.adaderana.lk/',
+        8000,
+        true,
+      )) as ArrayBuffer;
+      const html = Buffer.from(arrayBuffer).toString('utf8');
       const $ = cheerio.load(html);
 
       const lead_story = [];
