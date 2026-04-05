@@ -6,7 +6,7 @@ export class LatestNewsController {
   constructor(private readonly latestNewsService: LatestNewsService) {}
 
   //Get Lanka Deepa News
-  @Get('lankadepa/:page/:section?')
+  @Get(['lankadepa/:page', 'lankadepa/:page/:section'])
   async findOne(
     @Param('page') page: string,
     @Param('section') section?: string,
@@ -46,7 +46,7 @@ export class LatestNewsController {
   }
 
   //Get Lanka Deepa News
-  @Get('lankadepa/v1/:page/:section?')
+  @Get(['lankadepa/v1/:page', 'lankadepa/v1/:page/:section'])
   async findLankadepa(
     @Param('page') page: string,
     @Param('section') section?: string,
