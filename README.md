@@ -65,13 +65,3 @@ When **Version 0 (v0)** was originally launched, many leading Sri Lankan news ou
 If you encounter any issues or have questions, feel free to reach out:
 
 👉 https://www.nowenkottage.com/contactus
-
----
-
-## ☕ Support the Project
-
-If you find this API useful and would like to support ongoing development:
-
-👉 https://buymeacoffee.com/nowenportfj
-
-Your support helps keep the project maintained and continuously improved 🚀
