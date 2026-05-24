@@ -47,9 +47,6 @@ importers:
       '@pinecone-database/pinecone':
         specifier: ^7.2.0
         version: 7.2.0
-      '@vercel/sdk':
-        specifier: ^1.21.7
-        version: 1.21.7
       cache-manager:
         specifier: ^7.2.8
         version: 7.2.8
@@ -96,6 +93,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.59.4
         version: 8.59.4(eslint@10.4.0)(typescript@6.0.3)
+      '@vercel/sdk':
+        specifier: ^1.21.7
+        version: 1.21.7
       eslint:
         specifier: ^10.4.0
         version: 10.4.0
