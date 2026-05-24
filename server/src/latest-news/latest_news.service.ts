@@ -23,18 +23,27 @@ export class LatestNewsService {
     const id = setTimeout(() => controller.abort(), timeout);
 
     try {
-      const response = await fetch(url, { 
+      const response = await fetch(url, {
         signal: controller.signal,
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+          Accept:
+            'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.9,si;q=0.8',
-        }
+        },
       });
 
       if (!response.ok) {
+        const body = await response.text();
+        console.error(`403 body for ${url}:`, body.slice(0, 800));
+        console.error(
+          'Response headers:',
+          Object.fromEntries(response.headers),
+        );
         throw new Error(`HTTP Error: ${response.status}`);
       }
+      
       return asArrayBuffer
         ? await response.arrayBuffer()
         : await response.text();
