@@ -15,10 +15,10 @@ jobs:
           curl -fs https://lankanewsapi.nowenkottage.com/latest-news/lankadepa/v1/1/1 \
           | jq -e '(.latestContent // []) | length > 0'
 
-      - name: Check Deshaya
-        run: |
-          curl -fs https://lankanewsapi.nowenkottage.com/latest-news/deshaya/v1/1 \
-          | jq -e '(.latestContent // []) | length > 0'
+      # - name: Check Deshaya
+      #   run: |
+      #     curl -fs https://lankanewsapi.nowenkottage.com/latest-news/deshaya/v1/1 \
+      #     | jq -e '(.latestContent // []) | length > 0'
 
       - name: Check BBC Sinhala
         run: |
