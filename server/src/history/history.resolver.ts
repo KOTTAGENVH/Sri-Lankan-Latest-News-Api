@@ -43,8 +43,6 @@ export class HistoryResolver {
     @Args('text') text: string,
     @Args('limit', { type: () => Int, defaultValue: 10 }) limit: number,
   ) {
-    const safeLimit = Math.min(limit, 50);
-
-    return this.historyService.atlasSearchByQuery(text, safeLimit);
+    return this.historyService.atlasSearchByQuery(text, limit);
   }
 }

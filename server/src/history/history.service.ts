@@ -11,6 +11,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { News, NewsDocument } from '../database/mongodb/schemas/news.schema';
 import { Cache } from 'cache-manager';
+import { clampPage, clampLimit } from '../helper/pagination';
 
 @Injectable()
 export class HistoryService {
@@ -22,9 +23,10 @@ export class HistoryService {
   ) {}
 
   async getAllNews(page = 1) {
+    const safePage = clampPage(page);
     const limit = 20;
-    const skip = (page - 1) * limit;
-    const key = `news:all:${page}:${limit}`;
+    const skip = (safePage - 1) * limit;
+    const key = `news:all:${safePage}:${limit}`;
 
     const cached = await this.cache.get<News[]>(key);
     if (cached) return cached;
@@ -42,9 +44,10 @@ export class HistoryService {
   }
 
   async getNewsBySource(source: number, page = 1) {
+    const safePage = clampPage(page);
     const limit = 20;
-    const skip = (page - 1) * limit;
-    const key = `news:source:${source}:${page}:${limit}`;
+    const skip = (safePage - 1) * limit;
+    const key = `news:source:${source}:${safePage}:${limit}`;
 
     const cached = await this.cache.get<News[]>(key);
     if (cached) return cached;
@@ -87,10 +90,15 @@ export class HistoryService {
   }
 
   async getNewsbyDate(date: Date, page = 1) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+      throw new BadRequestException('Invalid date');
+    }
+
+    const safePage = clampPage(page);
     const limit = 20;
-    const skip = (page - 1) * limit;
+    const skip = (safePage - 1) * limit;
     const day = date.toISOString().split('T')[0];
-    const key = `news:date:${day}:${page}:${limit}`;
+    const key = `news:date:${day}:${safePage}:${limit}`;
 
     const cached = await this.cache.get<News[]>(key);
     if (cached) return cached;
@@ -115,9 +123,10 @@ export class HistoryService {
     return data;
   }
 
-  async sematicSearchByQuery(text: String, limit = 10) {
+  async sematicSearchByQuery(text: string, limit = 10) {
     try {
-      const key = `embeddingtext:${text}:limit:${limit}`;
+      const safeLimit = clampLimit(limit, 50, 10);
+      const key = `embeddingtext:${text}:limit:${safeLimit}`;
       const cached = await this.cache.get<any[]>(key);
       if (cached) {
         return cached;
@@ -163,7 +172,7 @@ export class HistoryService {
             path: 'plot_embedding',
             queryVector: embedding,
             numCandidates: 150,
-            limit: limit,
+            limit: safeLimit,
           },
         },
         {
@@ -203,9 +212,10 @@ export class HistoryService {
     }
   }
 
-  async atlasSearchByQuery(text: String, limit = 10) {
+  async atlasSearchByQuery(text: string, limit = 10) {
     try {
-      const key = `atlastext:${text}:limit:${limit}`;
+      const safeLimit = clampLimit(limit, 50, 10);
+      const key = `atlastext:${text}:limit:${safeLimit}`;
       const cached = await this.cache.get<any[]>(key);
       if (cached) {
         return cached;
@@ -225,7 +235,7 @@ export class HistoryService {
           },
         },
         {
-          $limit: limit,
+          $limit: safeLimit,
         },
         {
           $project: {

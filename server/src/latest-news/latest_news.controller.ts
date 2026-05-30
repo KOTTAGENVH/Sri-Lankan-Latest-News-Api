@@ -1,20 +1,20 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { LatestNewsService } from './latest_news.service';
 
 @Controller('latest-news')
 export class LatestNewsController {
   constructor(private readonly latestNewsService: LatestNewsService) {}
 
-  //Get Lanka Deepa News
+  // Get Lanka Deepa News
   @Get(['lankadepa/:page', 'lankadepa/:page/:section'])
   async findOne(
-    @Param('page') page: string,
-    @Param('section') section?: string,
+    @Param('page', ParseIntPipe) page: number,
+    @Param('section', new ParseIntPipe({ optional: true })) section?: number,
   ) {
     try {
       const latestContent = await this.latestNewsService.latestLankadeepa(
-        +page,
-        section ? +section : undefined,
+        page,
+        section,
       );
       return { latestContent };
     } catch (error) {
@@ -22,39 +22,38 @@ export class LatestNewsController {
     }
   }
 
-  //Get Deshaya News
+  // Get Deshaya News
   @Get('deshaya/:page')
-  async findDeshaya(@Param('page') page: string) {
+  async findDeshaya(@Param('page', ParseIntPipe) page: number) {
     try {
-      const latestContent = await this.latestNewsService.latestDeshaya(+page);
+      const latestContent = await this.latestNewsService.latestDeshaya(page);
       return { latestContent };
     } catch (error) {
       return { error: 'Error fetching latest news' };
     }
   }
 
-  //Get BBC Sinhala News
+  // Get BBC Sinhala News
   @Get('bbcsinhala/:page')
-  async findBBCSinhala(@Param('page') page: string) {
+  async findBBCSinhala(@Param('page', ParseIntPipe) page: number) {
     try {
-      const latestContent =
-        await this.latestNewsService.latestBBCSinhala(+page);
+      const latestContent = await this.latestNewsService.latestBBCSinhala(page);
       return { latestContent };
     } catch (error) {
       return { error: 'Error fetching latest news' };
     }
   }
 
-  //Get Lanka Deepa News
+  // Get Lanka Deepa News (v1)
   @Get(['lankadepa/v1/:page', 'lankadepa/v1/:page/:section'])
   async findLankadepa(
-    @Param('page') page: string,
-    @Param('section') section?: string,
+    @Param('page', ParseIntPipe) page: number,
+    @Param('section', new ParseIntPipe({ optional: true })) section?: number,
   ) {
     try {
       const latestContent = await this.latestNewsService.latestLankadeepa(
-        +page,
-        section ? +section : undefined,
+        page,
+        section,
       );
       return { latestContent };
     } catch (error) {
@@ -62,30 +61,29 @@ export class LatestNewsController {
     }
   }
 
-  //Get Deshaya News
+  // Get Deshaya News (v1)
   @Get('deshaya/v1/:page')
-  async findDeshaya_v1(@Param('page') page: string) {
+  async findDeshaya_v1(@Param('page', ParseIntPipe) page: number) {
     try {
-      const latestContent = await this.latestNewsService.latestDeshaya(+page);
+      const latestContent = await this.latestNewsService.latestDeshaya(page);
       return { latestContent };
     } catch (error) {
       return { error: 'Error fetching latest news' };
     }
   }
 
-  //Get BBC Sinhala News
+  // Get BBC Sinhala News (v1)
   @Get('bbcsinhala/v1/:page')
-  async findBBCSinhala_v1(@Param('page') page: string) {
+  async findBBCSinhala_v1(@Param('page', ParseIntPipe) page: number) {
     try {
-      const latestContent =
-        await this.latestNewsService.latestBBCSinhala(+page);
+      const latestContent = await this.latestNewsService.latestBBCSinhala(page);
       return { latestContent };
     } catch (error) {
       return { error: 'Error fetching latest news' };
     }
   }
 
-  //Get News First News (Tamil)
+  // Get News First News (Tamil)
   @Get('newsfirsttamil/v1')
   async findNewsFirstTamil() {
     try {
@@ -96,7 +94,7 @@ export class LatestNewsController {
     }
   }
 
-  //Get News  from Newswire English
+  // Get News from Newswire English
   @Get('newswire/v1')
   async findNewswire() {
     try {
@@ -107,7 +105,7 @@ export class LatestNewsController {
     }
   }
 
-  //Get News from Ada Derana English
+  // Get News from Ada Derana English
   @Get('adaderana/v1')
   async findAdaDerana() {
     try {
