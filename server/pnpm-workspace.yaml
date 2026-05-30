@@ -1,4 +1,7 @@
+packages:
+  - 'server'
+
 allowBuilds:
-  '@apollo/protobufjs': false
-  '@nestjs/core': false
+  '@apollo/protobufjs': true
+  '@nestjs/core': true
   unrs-resolver: false
