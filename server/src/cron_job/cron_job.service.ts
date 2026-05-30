@@ -74,11 +74,13 @@ export class CronJobService {
 
   private async saveLankadeepa(items: any[]) {
     try {
-      for (const item of items) {
-        const article =
-          item.article_lead || item.article_list || item.article_trending;
-
-        if (!article?.source || !article?.title) continue;
+      for (const article of items) {
+        if (!article?.source || !article?.title) {
+          console.error('LAnka deepa ttitle cannot be scraped!!!');
+          throw new Error(
+            `Lankadeepa article missing required fields - source: ${article?.source ?? 'null'}, title: ${article?.title ?? 'null'}`,
+          );
+        }
 
         await this.upsertNews({
           id: this.generateId('lankadeepa', article.source),
@@ -96,6 +98,7 @@ export class CronJobService {
         'Lankadeepa save failed',
         err instanceof Error ? err.stack : String(err),
       );
+      throw err;
     }
   }
 
@@ -119,6 +122,7 @@ export class CronJobService {
         'Deshaya save failed',
         err instanceof Error ? err.stack : String(err),
       );
+      throw err;
     }
   }
 
@@ -142,6 +146,7 @@ export class CronJobService {
         'BBC save failed',
         err instanceof Error ? err.stack : String(err),
       );
+      throw err;
     }
   }
 
@@ -173,6 +178,7 @@ export class CronJobService {
         'Newswire save failed',
         err instanceof Error ? err.stack : String(err),
       );
+      throw err;
     }
   }
 
@@ -208,6 +214,7 @@ export class CronJobService {
         'Adaderana save failed',
         err instanceof Error ? err.stack : String(err),
       );
+      throw err;
     }
   }
 
@@ -245,6 +252,7 @@ export class CronJobService {
         'Newsfirst tamil save failed',
         err instanceof Error ? err.stack : String(err),
       );
+      throw err;
     }
   }
 
