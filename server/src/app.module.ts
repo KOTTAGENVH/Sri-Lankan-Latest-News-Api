@@ -20,7 +20,7 @@ import { CustomThrottlerGuard } from './throtler.guard';
     ThrottlerModule.forRoot({
       throttlers: [
         {
-          ttl: 60,
+          ttl: 60_000,
           limit: 100,
         },
       ],
@@ -61,7 +61,7 @@ import { CustomThrottlerGuard } from './throtler.guard';
     }),
     CacheModule.register({
       isGlobal: true,
-      ttl: 60, // seconds
+      ttl: 60_000, // seconds
       max: 100,
       store: 'memory',
     }),

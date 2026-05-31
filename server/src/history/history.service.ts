@@ -15,7 +15,20 @@ import { clampPage, clampLimit } from '../helper/pagination';
 
 @Injectable()
 export class HistoryService {
-  private readonly TTL = 60; // seconds
+  private readonly TTL = 60_000; // seconds
+  private readonly TTL_PAST = 24 * 60 * 60_000;
+
+  private static readonly IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
+  private istDayParts(instant: Date) {
+    const ist = new Date(instant.getTime() + HistoryService.IST_OFFSET_MS);
+    const y = ist.getUTCFullYear();
+    const m = ist.getUTCMonth();
+    const d = ist.getUTCDate();
+    const key = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    return { y, m, d, key };
+  }
+
   constructor(
     @InjectModel(News.name)
     private readonly newsModel: Model<NewsDocument>,
@@ -97,29 +110,28 @@ export class HistoryService {
     const safePage = clampPage(page);
     const limit = 20;
     const skip = (safePage - 1) * limit;
-    const day = date.toISOString().split('T')[0];
-    const key = `news:date:${day}:${safePage}:${limit}`;
+    const offset = HistoryService.IST_OFFSET_MS;
 
+    const { y, m, d, key: day } = this.istDayParts(date);
+    const startOfDay = new Date(Date.UTC(y, m, d, 0, 0, 0, 0) - offset);
+    const endOfDay = new Date(Date.UTC(y, m, d, 23, 59, 59, 999) - offset);
+
+    const key = `news:date:${day}:${safePage}:${limit}`;
     const cached = await this.cache.get<News[]>(key);
     if (cached) return cached;
 
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
-
     const data = await this.newsModel
-      .find({
-        publishedAt: { $gte: startOfDay, $lte: endOfDay },
-      })
+      .find({ publishedAt: { $gte: startOfDay, $lte: endOfDay } })
       .sort({ publishedAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean()
       .exec();
 
-    await this.cache.set(key, data, this.TTL);
+    const ttl =
+      day < this.istDayParts(new Date()).key ? this.TTL_PAST : this.TTL;
+
+    await this.cache.set(key, data, ttl);
     return data;
   }
 
