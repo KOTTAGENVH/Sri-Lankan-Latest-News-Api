@@ -56,6 +56,11 @@ import { CustomThrottlerGuard } from './throtler.guard';
 
         return {
           uri: `mongodb+srv://${username}:${password}@${cluster}/${dbName}?retryWrites=true&w=majority`,
+          maxPoolSize: 2,
+          minPoolSize: 1,
+          maxIdleTimeMS: 10000,
+          serverSelectionTimeoutMS: 5000,
+          socketTimeoutMS: 45000,
         };
       },
     }),
@@ -67,7 +72,7 @@ import { CustomThrottlerGuard } from './throtler.guard';
     }),
     LatestNewsModule,
     HistoryModule,
-    CronJobModule
+    CronJobModule,
   ],
   controllers: [AppController],
   providers: [
