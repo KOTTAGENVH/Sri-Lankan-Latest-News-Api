@@ -18,111 +18,91 @@ jobs:
 
     env:
       API_KEY: ${{ secrets.API_KEY }}
-      BASE: https://lankanewsapi.nowenkottage.com/cronjob/v1/1/1
+      BASE: https://lankanewsapi.nowenkottage.com/cronjob/v1
 
     steps:
-      - name: Ingest news sources
-        run: |
-          set -uo pipefail
-          failed=()
-
-          for path in \
-            /lankadeepa \
-            /bbcsinhala \
-            /newswire \
-            /adaderana \
-            /newsfirsttamil \
-            /un
-          do
-            echo "::group::$path"
-            if curl -fsS --max-time 120 \
-                 -H "Authorization: Bearer $API_KEY" \
-                 "$BASE$path"
-            then
-              echo ""
-              echo "ok"
-            else
-              echo "FAILED"
-              failed+=("$path")
-            fi
-            echo "::endgroup::"
-            sleep 2
-          done
-
-          if [ ${#failed[@]} -ne 0 ]; then
-            echo "::error::news ingest failed: ${failed[*]}"
-            exit 1
-          fi
-
-      - name: Ingest IRD
+      - name: Lankadeepa
         if: always()
         run: |
-          set -uo pipefail
-          failed=()
+          curl -fsS --max-time 120 -H "Authorization: Bearer $API_KEY" \
+            "$BASE/lankadeepa" | tee /dev/stderr | jq -e '.saved != null'
 
-          for path in /ird/news /ird/content; do
-            echo "::group::$path"
-            if curl -fsS --max-time 180 \
-                 -H "Authorization: Bearer $API_KEY" \
-                 "$BASE$path"
-            then
-              echo ""
-              echo "ok"
-            else
-              echo "FAILED"
-              failed+=("$path")
-            fi
-            echo "::endgroup::"
-            sleep 2
-          done
-
-          if [ ${#failed[@]} -ne 0 ]; then
-            echo "::error::IRD ingest failed: ${failed[*]}"
-            exit 1
-          fi
-
-      - name: Ingest vulnerability sources
+      - name: BBC Sinhala
         if: always()
         run: |
-          set -uo pipefail
-          failed=()
+          curl -fsS --max-time 120 -H "Authorization: Bearer $API_KEY" \
+            "$BASE/bbcsinhala" | tee /dev/stderr | jq -e '.saved != null'
 
-          for path in \
-            /cyber/kev \
-            /cyber/euvd/latest \
-            /cyber/euvd/critical \
-            /cyber/euvd/exploited
-          do
-            echo "::group::$path"
-            if curl -fsS --max-time 180 \
-                 -H "Authorization: Bearer $API_KEY" \
-                 "$BASE$path"
-            then
-              echo ""
-              echo "ok"
-            else
-              echo "FAILED"
-              failed+=("$path")
-            fi
-            echo "::endgroup::"
-            sleep 5 # EUVD is rate-sensitive
-          done
-
-          if [ ${#failed[@]} -ne 0 ]; then
-            echo "::error::vuln ingest failed: ${failed[*]}"
-            exit 1
-          fi
-
-      - name: Ingest merged cyber feed
+      - name: NewsWire
         if: always()
         run: |
-          curl -fsS --max-time 180 \
-            -H "Authorization: Bearer $API_KEY" \
-            "$BASE/cyber"
+          curl -fsS --max-time 120 -H "Authorization: Bearer $API_KEY" \
+            "$BASE/newswire" | tee /dev/stderr | jq -e '.saved != null'
+
+      - name: AdaDerana
+        if: always()
+        run: |
+          curl -fsS --max-time 120 -H "Authorization: Bearer $API_KEY" \
+            "$BASE/adaderana" | tee /dev/stderr | jq -e '.saved != null'
+
+      - name: NewsFirst Tamil
+        if: always()
+        run: |
+          curl -fsS --max-time 120 -H "Authorization: Bearer $API_KEY" \
+            "$BASE/newsfirsttamil" | tee /dev/stderr | jq -e '.saved != null'
+
+      - name: UN News
+        if: always()
+        run: |
+          curl -fsS --max-time 120 -H "Authorization: Bearer $API_KEY" \
+            "$BASE/un" | tee /dev/stderr | jq -e '.saved != null'
+
+      - name: IRD News
+        if: always()
+        run: |
+          curl -fsS --max-time 180 -H "Authorization: Bearer $API_KEY" \
+            "$BASE/ird/news" | tee /dev/stderr | jq -e '.saved != null'
+
+      - name: IRD Content
+        if: always()
+        run: |
+          curl -fsS --max-time 180 -H "Authorization: Bearer $API_KEY" \
+            "$BASE/ird/content" | tee /dev/stderr | jq -e '.saved != null'
+
+      - name: CISA KEV
+        if: always()
+        run: |
+          curl -fsS --max-time 180 -H "Authorization: Bearer $API_KEY" \
+            "$BASE/cyber/kev" | tee /dev/stderr | jq -e '.saved != null'
+
+      - name: EUVD latest
+        if: always()
+        run: |
+          curl -fsS --max-time 180 -H "Authorization: Bearer $API_KEY" \
+            "$BASE/cyber/euvd/latest" | tee /dev/stderr | jq -e '.saved != null'
+          sleep 5
+
+      - name: EUVD critical
+        if: always()
+        run: |
+          curl -fsS --max-time 180 -H "Authorization: Bearer $API_KEY" \
+            "$BASE/cyber/euvd/critical" | tee /dev/stderr | jq -e '.saved != null'
+          sleep 5
+
+      - name: EUVD exploited
+        if: always()
+        run: |
+          curl -fsS --max-time 180 -H "Authorization: Bearer $API_KEY" \
+            "$BASE/cyber/euvd/exploited" | tee /dev/stderr | jq -e '.saved != null'
+
+      - name: Merged cyber feed
+        if: always()
+        run: |
+          curl -fsS --max-time 180 -H "Authorization: Bearer $API_KEY" \
+            "$BASE/cyber" | tee /dev/stderr | jq -e '.saved != null'
 
       - name: Storage status
         if: always()
         run: |
-          curl -fsS --max-time 60 \
-            -H "Authorization: Bearer $API_KEY" \
-            "$BASE/storageStatus"
+          curl -fsS --max-time 60 -H "Authorization: Bearer $API_KEY" \
+            "$BASE/storageStatus" | tee /dev/stderr | jq -e '.status != "error"'
