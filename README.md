@@ -28,7 +28,7 @@ When **Version 0 (v0)** was originally launched, many leading Sri Lankan news ou
 
 ---
 
-## 🚀 What’s New in Latest Sri Lanka News API — v1
+## 🚀 What’s New in Latest Sri Lanka News API - v1
 
 ### 🔹 Improved Performance
 - Introduced **server-side caching** to help reduce latency and improve response times.
@@ -60,18 +60,28 @@ When **Version 0 (v0)** was originally launched, many leading Sri Lankan news ou
 
 ---
 
+## ⚖️ Legal & Attribution
+
+Full terms: [Terms & Conditions](https://www.nowenkottage.com/legal)
+
+Every response includes an `attribution` block naming the source, its URL, the retrieval
+method, and the applicable licence. Wikipedia and Wikivoyage content is CC BY-SA 4.0; CISA
+and NIST data is US Government public domain. All other sources remain the property of the
+original publisher.
+
+**Formal takedown requests** - if you are an authorized representative of a news agency and
+wish to have your content excluded from this API, submit a request via the
+[contact page](https://www.nowenkottage.com/contactus), including the source name, the URLs
+concerned, and your role at the organization. We verify that requests come from an authorized
+representative before actioning them, and we're based in Sri Lanka and can confirm in person
+where that's easier for you. Fraudulent requests, impersonation of a publisher, or messages
+containing malware or phishing links will be reported to the relevant authorities and to the
+publisher being impersonated.
+
+---
+
 ## 📬 Support & Contact
 
 If you encounter any issues or have questions, feel free to reach out:
 
 👉 https://www.nowenkottage.com/contactus
-
----
-
-## ☕ Support the Project
-
-If you find this API useful and would like to support ongoing development:
-
-👉 https://buymeacoffee.com/nowenportfj
-
-Your support helps keep the project maintained and continuously improved 🚀
