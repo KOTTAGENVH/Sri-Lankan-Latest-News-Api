@@ -1,8 +1,11 @@
 import { Resolver, Query, Args, Int } from '@nestjs/graphql';
 import { HistoryService } from './history.service';
 import { History } from './entities/history.entity';
+import { PublicApiGuard } from '../helper/api_guard';
+import { UseGuards } from '@nestjs/common';
 // import { SemanticSearchResult } from './entities/sematic_search.entity';
 
+@UseGuards(PublicApiGuard)
 @Resolver(() => History)
 export class HistoryResolver {
   constructor(private readonly historyService: HistoryService) {}
@@ -18,6 +21,16 @@ export class HistoryResolver {
     @Args('page', { type: () => Int, defaultValue: 1 }) page: number,
   ) {
     return this.historyService.getNewsBySource(source, page);
+  }
+
+  @Query(() => [History])
+  irdNews(@Args('page', { type: () => Int, defaultValue: 1 }) page: number) {
+    return this.historyService.getIrdNews(page);
+  }
+
+  @Query(() => [History])
+  cyberNews(@Args('page', { type: () => Int, defaultValue: 1 }) page: number) {
+    return this.historyService.getCyberNews(page);
   }
 
   @Query(() => [History])

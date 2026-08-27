@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { HttpException, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LatestNewsModule } from './latest-news/latest_news.module';
@@ -35,6 +35,16 @@ import { CustomThrottlerGuard } from './throtler.guard';
       playground: process.env.NODE_ENV !== 'production',
       introspection: process.env.NODE_ENV !== 'production',
       context: ({ req, res }) => ({ req, res }),
+      formatError: (formattedError, error) => {
+        const original = (error as any)?.originalError;
+        if (!original) return formattedError;
+        if (original instanceof HttpException) return formattedError;
+        console.error('GraphQL error:', original);
+        return {
+          message: 'Internal server error',
+          extensions: { code: 'INTERNAL_SERVER_ERROR' },
+        };
+      },
       plugins:
         process.env.NODE_ENV === 'production'
           ? [ApolloServerPluginLandingPageDisabled()]
@@ -67,7 +77,7 @@ import { CustomThrottlerGuard } from './throtler.guard';
     CacheModule.register({
       isGlobal: true,
       ttl: 60_000, // seconds
-      max: 100,
+      max: 2000,
       store: 'memory',
     }),
     LatestNewsModule,

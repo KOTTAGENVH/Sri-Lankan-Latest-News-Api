@@ -23,6 +23,12 @@ export class News {
   @Prop({ type: Date, required: true, index: true })
   fetchedAt: Date;
 
+  @Prop({ type: Date })
+  lastSeenAt?: Date;
+
+  @Prop({ type: Boolean, default: false, index: true })
+  pinned?: boolean;
+
   @Prop({ required: true, index: true })
   source: string;
 

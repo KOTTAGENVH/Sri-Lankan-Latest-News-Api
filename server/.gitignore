@@ -128,3 +128,13 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Vercel
+.vercel
+
+# Nest
+/dist
+
+# OS
+.DS_Store
+Thumbs.db
