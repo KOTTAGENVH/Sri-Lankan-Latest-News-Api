@@ -6,6 +6,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -15,13 +16,25 @@ import { clampPage, clampLimit } from '../helper/pagination';
 
 @Injectable()
 export class HistoryService {
-  private readonly TTL = 60_000; // seconds
-  private readonly TTL_PAST = 24 * 60 * 60_000;
+  private readonly logger = new Logger(HistoryService.name);
+  private readonly ttl = 60_000; // seconds
+  private readonly ttl_past = 24 * 60 * 60_000;
 
-  private static readonly IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+  private static readonly ist_offset_ms = 5.5 * 60 * 60 * 1000;
+  private static readonly ird_sources = ['ird_news', 'ird_content'];
+  private static readonly source_map: Record<number, Record<string, any>> = {
+    0: { source: 'lankadeepa' },
+    2: { source: 'bbcSinhala' },
+    3: { source: 'newswire' },
+    4: { source: 'adaderana' },
+    5: { source: 'newsfirst_tamil' },
+    6: { source: { $in: ['ird_news', 'ird_content'] } },
+    7: { category: 'cybersecurity' },
+    8: { source: 'un_news' },
+  };
 
   private istDayParts(instant: Date) {
-    const ist = new Date(instant.getTime() + HistoryService.IST_OFFSET_MS);
+    const ist = new Date(instant.getTime() + HistoryService.ist_offset_ms);
     const y = ist.getUTCFullYear();
     const m = ist.getUTCMonth();
     const d = ist.getUTCDate();
@@ -46,17 +59,24 @@ export class HistoryService {
 
     const data = await this.newsModel
       .find()
-      .sort({ publishedAt: -1 })
+      .sort({ publishedAt: -1, fetchedAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean()
       .exec();
 
-    await this.cache.set(key, data, this.TTL);
+    await this.cache.set(key, data, this.ttl);
     return data;
   }
 
   async getNewsBySource(source: number, page = 1) {
+    const filter = HistoryService.source_map[source];
+    if (!filter) {
+      throw new BadRequestException(
+        `Invalid source. Valid: ${Object.keys(HistoryService.source_map).join(', ')}`,
+      );
+    }
+
     const safePage = clampPage(page);
     const limit = 20;
     const skip = (safePage - 1) * limit;
@@ -65,40 +85,57 @@ export class HistoryService {
     const cached = await this.cache.get<News[]>(key);
     if (cached) return cached;
 
-    let querySource: string;
-
-    switch (source) {
-      case 0:
-        querySource = 'lankadeepa';
-        break;
-      case 1:
-        querySource = 'deshaya';
-        break;
-      case 2:
-        querySource = 'bbcSinhala';
-        break;
-      case 3:
-        querySource = 'newswire';
-        break;
-      case 4:
-        querySource = 'adaderana';
-        break;
-      case 5:
-        querySource = 'newsfirst_tamil';
-        break;
-      default:
-        throw new BadRequestException('Invalid source number');
-    }
-
     const data = await this.newsModel
-      .find({ source: querySource })
-      .sort({ publishedAt: -1 })
+      .find(filter)
+      .sort({ publishedAt: -1, fetchedAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean()
       .exec();
 
-    await this.cache.set(key, data, this.TTL);
+    await this.cache.set(key, data, this.ttl);
+    return data;
+  }
+
+  async getIrdNews(page = 1) {
+    const safePage = clampPage(page);
+    const limit = 20;
+    const skip = (safePage - 1) * limit;
+    const key = `news:ird:${safePage}:${limit}`;
+
+    const cached = await this.cache.get<News[]>(key);
+    if (cached) return cached;
+
+    const data = await this.newsModel
+      .find({ source: { $in: HistoryService.ird_sources } })
+      .sort({ publishedAt: -1, fetchedAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .exec();
+
+    await this.cache.set(key, data, this.ttl);
+    return data;
+  }
+
+  async getCyberNews(page = 1) {
+    const safePage = clampPage(page);
+    const limit = 20;
+    const skip = (safePage - 1) * limit;
+    const key = `news:cyber:${safePage}:${limit}`;
+
+    const cached = await this.cache.get<News[]>(key);
+    if (cached) return cached;
+
+    const data = await this.newsModel
+      .find({ category: 'cybersecurity' })
+      .sort({ publishedAt: -1, fetchedAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .exec();
+
+    await this.cache.set(key, data, this.ttl);
     return data;
   }
 
@@ -110,7 +147,7 @@ export class HistoryService {
     const safePage = clampPage(page);
     const limit = 20;
     const skip = (safePage - 1) * limit;
-    const offset = HistoryService.IST_OFFSET_MS;
+    const offset = HistoryService.ist_offset_ms;
 
     const { y, m, d, key: day } = this.istDayParts(date);
     const startOfDay = new Date(Date.UTC(y, m, d, 0, 0, 0, 0) - offset);
@@ -122,14 +159,14 @@ export class HistoryService {
 
     const data = await this.newsModel
       .find({ publishedAt: { $gte: startOfDay, $lte: endOfDay } })
-      .sort({ publishedAt: -1 })
+      .sort({ publishedAt: -1, fetchedAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean()
       .exec();
 
     const ttl =
-      day < this.istDayParts(new Date()).key ? this.TTL_PAST : this.TTL;
+      day < this.istDayParts(new Date()).key ? this.ttl_past : this.ttl;
 
     await this.cache.set(key, data, ttl);
     return data;
@@ -272,7 +309,8 @@ export class HistoryService {
       await this.cache.set(key, result, 60 * 60);
 
       return result;
-    } catch (error: any) {
+        } catch (error) {
+      this.logger.error('Atlas search failed', error instanceof Error ? error.stack : String(error));
       throw new InternalServerErrorException('Atlas search failed');
     }
   }
