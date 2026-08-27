@@ -1,38 +1,135 @@
-name: Run News Cron Jobs
+name: Scraper Health Check
 
 on:
   schedule:
-    - cron: "30 18 * * *" # 18:30 UTC = 12:00 AM IST
+    - cron: '30 18 * * *' # 18:30 UTC = 12:00 AM IST
   workflow_dispatch:
 
 jobs:
-  run-crons:
+  health-check:
     runs-on: ubuntu-latest
 
     env:
-      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      API_KEY: ${{ secrets.API_KEY }}
+      BASE: https://lankanewsapi.nowenkottage.com/latest-news
 
     steps:
-      - name: Run All Crons with Retry
+      - name: Check Lankadeepa
         run: |
-          retry() {
-            local url=$1
-            for i in {1..10}; do
-              echo "Attempt $i → $url"
-              if curl -fsS "$url"; then
-                return 0
-              fi
-              sleep 5
-            done
-            echo "Failed after 10 attempts: $url"
-            return 1
-          }
+          curl -fs -H "latest-news-api-key: $API_KEY" \
+            "$BASE/lankadepa/v1/1" \
+          | jq -e '(.latestContent // []) | length > 0'
 
-          retry "https://lankanewsapi.nowenkottage.com/cronjob/v1/lankadeepa?cron_secret=$CRON_SECRET"
-          retry "https://lankanewsapi.nowenkottage.com/cronjob/v1/deshaya?cron_secret=$CRON_SECRET"
-          retry "https://lankanewsapi.nowenkottage.com/cronjob/v1/bbcsinhala?cron_secret=$CRON_SECRET"
-          retry "https://lankanewsapi.nowenkottage.com/cronjob/v1/newswire?cron_secret=$CRON_SECRET"
-          retry "https://lankanewsapi.nowenkottage.com/cronjob/v1/newsfirsttamil?cron_secret=$CRON_SECRET"
-          retry "https://lankanewsapi.nowenkottage.com/cronjob/v1/adaderana?cron_secret=$CRON_SECRET"
-          retry "https://lankanewsapi.nowenkottage.com/cronjob/v1/storageStatus?cron_secret=$CRON_SECRET"
+      - name: Check BBC Sinhala
+        run: |
+          curl -fs -H "latest-news-api-key: $API_KEY" \
+            "$BASE/bbcsinhala/v1/3" \
+          | jq -e '(.latestContent // []) | length > 0'
 
+      - name: Check NewsFirst Tamil
+        run: |
+          curl -fs -H "latest-news-api-key: $API_KEY" \
+            "$BASE/newsfirsttamil/v1" \
+          | jq -e '(.latestContent.latest // []) | length > 0'
+
+      - name: Check NewsWire
+        run: |
+          curl -fs -H "latest-news-api-key: $API_KEY" \
+            "$BASE/newswire/v1" \
+          | jq -e '(.latestContent.latest // []) | length > 0'
+
+      - name: Check AdaDerana feed
+        run: |
+          curl -fs -H "latest-news-api-key: $API_KEY" \
+            "$BASE/adaderana/v1" \
+          | jq -e '(.latestContent.all // []) | length > 0'
+
+      - name: Check AdaDerana categories
+        run: |
+          curl -fs -H "latest-news-api-key: $API_KEY" \
+            "$BASE/adaderana/v1" \
+          | jq -e '(.latestContent.latest // []) | length > 0'
+
+      - name: Check AdaDerana enrichment
+        run: |
+          curl -fs -H "latest-news-api-key: $API_KEY" \
+            "$BASE/adaderana/v1" \
+          | jq -e '[.latestContent.all[] | select(.image != null)] | length > 0'
+
+      - name: Check UN News
+        run: |
+          curl -fs --max-time 60 -H "latest-news-api-key: $API_KEY" \
+            "$BASE/un/v1" \
+          | jq -e '(.latestContent // []) | length > 0'
+
+      - name: Check Attribution block
+        run: |
+          curl -fs -H "latest-news-api-key: $API_KEY" \
+            "$BASE/adaderana/v1" \
+          | jq -e '.attribution | (.source != null) and (.legal != null) and (.retrievedAt != null)'
+
+      - name: Check IRD News
+        run: |
+          curl -fs --max-time 60 -H "latest-news-api-key: $API_KEY" \
+            "$BASE/ird/news/v1" \
+          | jq -e '(.latestContent // []) | length > 0'
+
+      - name: Check IRD Content
+        run: |
+          curl -fs --max-time 60 -H "latest-news-api-key: $API_KEY" \
+            "$BASE/ird/content/v1" \
+          | jq -e '(.latestContent // []) | length > 0'
+
+      - name: Check CISA KEV
+        run: |
+          curl -fs --max-time 60 -H "latest-news-api-key: $API_KEY" \
+            "$BASE/cyber/kev/v1?limit=5" \
+          | jq -e '(.latestContent // []) | length > 0'
+
+      - name: Check KEV field shape
+        run: |
+          curl -fs --max-time 60 -H "latest-news-api-key: $API_KEY" \
+            "$BASE/cyber/kev/v1?limit=1" \
+          | jq -e '.latestContent[0] | (.cveId != null) and (.link != null) and (.kevDateAdded != null)'
+
+      - name: Check EUVD Latest
+        run: |
+          curl -fs --max-time 60 -H "latest-news-api-key: $API_KEY" \
+            "$BASE/cyber/euvd/v1/latest" \
+          | jq -e '(.latestContent // []) | length > 0'
+
+      - name: Check EUVD Critical
+        run: |
+          curl -fs --max-time 60 -H "latest-news-api-key: $API_KEY" \
+            "$BASE/cyber/euvd/v1/critical" \
+          | jq -e '(.latestContent // []) | length > 0'
+
+      - name: Check Merged Vuln Feed
+        run: |
+          curl -fs --max-time 180 -H "latest-news-api-key: $API_KEY" \
+            "$BASE/cyber/vulns/v1?limit=10" \
+          | jq -e '(.latestContent // []) | length > 0'
+
+      - name: Check Cyber Stats
+        run: |
+          curl -fs --max-time 180 -H "latest-news-api-key: $API_KEY" \
+            "$BASE/cyber/stats/v1" \
+          | jq -e '(.latestContent.total // 0) > 0'
+
+      - name: Check UN News region
+        run: |
+          curl -fs --max-time 60 -H "latest-news-api-key: $API_KEY" \
+            "$BASE/un/v1/asia" \
+          | jq -e '(.latestContent // []) | length > 0'
+
+      - name: Check World Events
+        run: |
+          curl -fs --max-time 60 -H "latest-news-api-key: $API_KEY" \
+            "$BASE/wiki/events/v1" \
+          | jq -e '(.latestContent.sections // []) | length > 0'
+
+      - name: Check Country Guide
+        run: |
+          curl -fs --max-time 60 -H "latest-news-api-key: $API_KEY" \
+            "$BASE/wiki/guide/v1/Sri_Lanka" \
+          | jq -e '.latestContent.title != null'
