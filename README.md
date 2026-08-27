@@ -71,8 +71,12 @@ original publisher.
 
 **Formal takedown requests** - if you are an authorized representative of a news agency and
 wish to have your content excluded from this API, submit a request via the
-[contact page](https://www.nowenkottage.com/contactus), including the source name and the
-URLs concerned. Requests are actioned with strict verification process and may require physical visits if necessary.
+[contact page](https://www.nowenkottage.com/contactus), including the source name, the URLs
+concerned, and your role at the organization. We verify that requests come from an authorized
+representative before actioning them, and we're based in Sri Lanka and can confirm in person
+where that's easier for you. Fraudulent requests, impersonation of a publisher, or messages
+containing malware or phishing links will be reported to the relevant authorities and to the
+publisher being impersonated.
 
 ---
 
