@@ -9,17 +9,6 @@ async function bootstrap() {
 
     app.useGlobalFilters(new AllExceptionsFilter());
 
-    app.enableCors({
-      origin: '*',
-      methods: ['GET', 'POST', 'OPTIONS'],
-      allowedHeaders: [
-        'Content-Type',
-        'Authorization',
-        'X-RapidAPI-Key',
-        'API_KEY',
-        // 'EMBEDDING_API_KEY',
-      ],
-    });
     await app.listen(port);
     console.log(`Server is running on http://localhost:${port}`);
   } catch (error) {

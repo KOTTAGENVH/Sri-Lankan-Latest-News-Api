@@ -52,6 +52,12 @@ export class ApiKeyGuard implements CanActivate {
 
 @Injectable()
 export class PublicApiGuard implements CanActivate {
+  constructor() {
+    for (const k of ['API_KEY', 'CRON_KEY', 'RAPIDAPI_PROXY_SECRET']) {
+      if (!process.env[k]) throw new Error(`PublicApiGuard: ${k} is not set`);
+    }
+  }
+
   private readonly logger = new Logger(PublicApiGuard.name);
 
   canActivate(context: ExecutionContext): boolean {
@@ -66,9 +72,7 @@ export class PublicApiGuard implements CanActivate {
         : auth;
 
     const isOwner = safeEqual(key, process.env.API_KEY);
-    const isRapid =
-      safeEqual(key, process.env.RAPIDAPI_KEY) ||
-      safeEqual(
+    const isRapid = safeEqual(
         headers['x-rapidapi-proxy-secret'],
         process.env.RAPIDAPI_PROXY_SECRET,
       );
