@@ -53,7 +53,7 @@ export class ApiKeyGuard implements CanActivate {
 @Injectable()
 export class PublicApiGuard implements CanActivate {
   constructor() {
-    for (const k of ['API_KEY', 'CRON_KEY', 'RAPIDAPI_PROXY_SECRET']) {
+    for (const k of ['API_KEY', 'RAPIDAPI_PROXY_SECRET']) {
       if (!process.env[k]) throw new Error(`PublicApiGuard: ${k} is not set`);
     }
   }
