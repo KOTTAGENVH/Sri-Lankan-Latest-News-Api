@@ -17,7 +17,7 @@ jobs:
       - name: Check Lankadeepa
         run: |
           curl -fs -H "Authorization: Bearer $API_KEY" \
-            "$BASE/lankadepa/v1/1" \
+            "$BASE/lankadepa/v1/1/1" \
           | jq -e '(.latestContent // []) | length > 0'
 
       - name: Check BBC Sinhala
