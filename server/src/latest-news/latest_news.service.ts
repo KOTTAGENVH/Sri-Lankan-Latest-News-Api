@@ -716,7 +716,9 @@ export class LatestNewsService {
             const refs = item
               .find('a[href^="http"]')
               .toArray()
-              .map((a) => $(a).attr('href'))
+              .map((a) =>
+                safeUrl($(a).attr('href'), 'https://en.wikipedia.org'),
+              )
               .filter(Boolean) as string[];
             return {
               text: cleanField(item.text(), 1000, { typographic: true }),

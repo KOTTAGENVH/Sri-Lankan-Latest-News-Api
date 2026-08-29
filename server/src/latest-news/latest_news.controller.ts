@@ -25,33 +25,6 @@ export class LatestNewsController {
     return { latestContent, attribution };
   }
 
-  // Get Lanka Deepa News
-  @Get(['lankadepa/:page', 'lankadepa/:page/:section'])
-  async findOne(
-    @Param('page', ParseIntPipe) page: number,
-    @Param('section', new ParseIntPipe({ optional: true })) section?: number,
-  ) {
-    try {
-      return await this.withAttribution('lankadeepa', () =>
-        this.latestNewsService.latestLankadeepa(page, section),
-      );
-    } catch (error) {
-      return { error: 'Error fetching latest news' };
-    }
-  }
-
-  // Get BBC Sinhala News
-  @Get('bbcsinhala/:page')
-  async findBBCSinhala(@Param('page', ParseIntPipe) page: number) {
-    try {
-      return await this.withAttribution('bbcSinhala', () =>
-        this.latestNewsService.latestBBCSinhala(page),
-      );
-    } catch (error) {
-      return { error: 'Error fetching latest news' };
-    }
-  }
-
   // Get Lanka Deepa News (v1)
   @Get(['lankadepa/v1/:page', 'lankadepa/v1/:page/:section'])
   async findLankadepa(
