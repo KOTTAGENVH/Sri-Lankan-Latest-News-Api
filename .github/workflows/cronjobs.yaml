@@ -69,12 +69,6 @@ jobs:
           curl -fsS --max-time 180 -H "Authorization: Bearer $API_KEY" \
             "$BASE/ird/content" | tee /dev/stderr | jq -e '.saved != null'
 
-      - name: CISA KEV
-        if: always()
-        run: |
-          curl -fsS --max-time 180 -H "Authorization: Bearer $API_KEY" \
-            "$BASE/cyber/kev" | tee /dev/stderr | jq -e '.saved != null'
-
       - name: EUVD latest
         if: always()
         run: |
@@ -95,11 +89,6 @@ jobs:
           curl -fsS --max-time 180 -H "Authorization: Bearer $API_KEY" \
             "$BASE/cyber/euvd/exploited" | tee /dev/stderr | jq -e '.saved != null'
 
-      - name: Merged cyber feed
-        if: always()
-        run: |
-          curl -fsS --max-time 180 -H "Authorization: Bearer $API_KEY" \
-            "$BASE/cyber" | tee /dev/stderr | jq -e '.saved != null'
 
       - name: Storage status
         if: always()
