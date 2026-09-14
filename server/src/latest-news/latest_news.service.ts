@@ -1,7 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { MemoryCacheService } from '../cache/cache.service';
 import * as cheerio from 'cheerio';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import type { Cache } from 'cache-manager';
 import { safeUrl, cleanField } from '../helper/fieldCleaner';
 import { createHash } from 'crypto';
 import { clampPage, clampSection } from '../helper/pagination';
@@ -18,7 +17,7 @@ import {
 
 @Injectable()
 export class LatestNewsService {
-  constructor(@Inject(CACHE_MANAGER) private cache: Cache) {}
+    constructor(private readonly cache: MemoryCacheService) {}
 
   //urls
   private readonly ird_site = 'https://www.ird.gov.lk';

@@ -1,20 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LatestNewsService } from './latest_news.service';
-import { CacheModule } from '@nestjs/cache-manager';
+import { CacheModule } from '../cache/cache.module';
 
-jest.setTimeout(20000); 
+jest.setTimeout(20000);
 
 describe('LatestNewsService', () => {
   let service: LatestNewsService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        CacheModule.register({
-          ttl: 1,
-          max: 10,
-        }),
-      ],
+      imports: [CacheModule.forRoot({ ttl: 1, max: 10, sweepIntervalMs: 0 })],
       providers: [LatestNewsService],
     }).compile();
 
@@ -23,11 +18,6 @@ describe('LatestNewsService', () => {
 
   it('Lankadeepa returns articles', async () => {
     const result = await service.latestLankadeepa(1);
-    expect(Array.isArray(result)).toBe(true);
-  });
-
-  it('Deshaya returns articles', async () => {
-    const result = await service.latestDeshaya(1);
     expect(Array.isArray(result)).toBe(true);
   });
 

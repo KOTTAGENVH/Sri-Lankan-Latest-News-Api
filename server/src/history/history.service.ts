@@ -1,9 +1,7 @@
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   BadGatewayException,
   BadRequestException,
   GatewayTimeoutException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -11,8 +9,8 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { News, NewsDocument } from '../database/mongodb/schemas/news.schema';
-import { Cache } from 'cache-manager';
 import { clampPage, clampLimit } from '../helper/pagination';
+import { MemoryCacheService } from '../cache/cache.service';
 
 @Injectable()
 export class HistoryService {
@@ -45,7 +43,7 @@ export class HistoryService {
   constructor(
     @InjectModel(News.name)
     private readonly newsModel: Model<NewsDocument>,
-    @Inject(CACHE_MANAGER) private cache: Cache,
+    private readonly cache: MemoryCacheService,
   ) {}
 
   async getAllNews(page = 1) {
@@ -309,8 +307,11 @@ export class HistoryService {
       await this.cache.set(key, result, 60 * 60);
 
       return result;
-        } catch (error) {
-      this.logger.error('Atlas search failed', error instanceof Error ? error.stack : String(error));
+    } catch (error) {
+      this.logger.error(
+        'Atlas search failed',
+        error instanceof Error ? error.stack : String(error),
+      );
       throw new InternalServerErrorException('Atlas search failed');
     }
   }
