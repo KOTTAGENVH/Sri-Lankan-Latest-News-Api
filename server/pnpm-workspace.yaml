@@ -6,3 +6,6 @@ allowBuilds:
   '@nestjs/core': true
   '@parcel/watcher': set this to true or false
   unrs-resolver: false
+
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
