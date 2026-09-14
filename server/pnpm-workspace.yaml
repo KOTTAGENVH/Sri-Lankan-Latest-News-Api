@@ -4,8 +4,6 @@ packages:
 allowBuilds:
   '@apollo/protobufjs': true
   '@nestjs/core': true
-  '@parcel/watcher': set this to true or false
+  '@parcel/watcher': false
   unrs-resolver: false
 
-ignoredBuiltDependencies:
-  - '@parcel/watcher'
