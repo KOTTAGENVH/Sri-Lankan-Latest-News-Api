@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { LatestNewsModule } from './latest-news/latest_news.module';
 import { NotFoundFilter } from './not-found-filter';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
-import { CacheModule } from '@nestjs/cache-manager';
 import { HistoryModule } from './history/history.module';
 import { CronJobModule } from './cron_job/cron_job.module';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -14,9 +13,11 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/disabled';
 import { CustomThrottlerGuard } from './throtler.guard';
+import { CacheModule } from './cache/cache.module';
 
 @Module({
   imports: [
+    CacheModule.forRoot({ ttl: 60_000, max: 2000 }),
     ThrottlerModule.forRoot({
       throttlers: [
         {
@@ -73,12 +74,6 @@ import { CustomThrottlerGuard } from './throtler.guard';
           socketTimeoutMS: 45000,
         };
       },
-    }),
-    CacheModule.register({
-      isGlobal: true,
-      ttl: 60_000, // seconds
-      max: 2000,
-      store: 'memory',
     }),
     LatestNewsModule,
     HistoryModule,
