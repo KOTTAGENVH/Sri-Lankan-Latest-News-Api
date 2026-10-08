@@ -126,6 +126,33 @@ export class LatestNewsService {
     },
   };
 
+  private async searchEuvdOnce(opts: {
+    text?: string;
+    vendor?: string;
+    product?: string;
+    fromScore?: number;
+    toScore?: number;
+    fromDate?: string;
+    exploited?: boolean;
+    size?: number;
+  }): Promise<VulnItem[]> {
+    const qs = new URLSearchParams();
+
+    for (const [k, v] of Object.entries(opts)) {
+      if (v === undefined || v === null || v === '') continue;
+
+      if (typeof v === 'number') {
+        if (!Number.isFinite(v)) continue;
+        qs.set(k, String(v));
+        continue;
+      }
+
+      qs.set(k, String(v).slice(0, 200));
+    }
+
+    return this.euvdCall(`/api/search?${qs.toString()}`, 600_000);
+  }
+
   private async stampFetch(sourceKey: string) {
     await this.cache.set(
       `fetched-at:${sourceKey}`,
@@ -870,31 +897,33 @@ export class LatestNewsService {
   }
 
   async searchEuvd(opts: {
-    text?: string;
-    vendor?: string;
-    product?: string;
-    fromScore?: number;
-    toScore?: number;
-    fromDate?: string;
-    exploited?: boolean;
-    size?: number;
-  }): Promise<VulnItem[]> {
-    const qs = new URLSearchParams();
-
-    for (const [k, v] of Object.entries(opts)) {
-      if (v === undefined || v === null || v === '') continue;
-
-      if (typeof v === 'number') {
-        if (!Number.isFinite(v)) continue;
-        qs.set(k, String(v));
-        continue;
-      }
-
-      qs.set(k, String(v).slice(0, 200));
-    }
-
-    return this.euvdCall(`/api/search?${qs.toString()}`, 600_000);
+  text?: string;
+  vendor?: string;
+  product?: string;
+  fromScore?: number;
+  toScore?: number;
+  fromDate?: string;
+  exploited?: boolean;
+  size?: number;
+}): Promise<VulnItem[]> {
+  if (!opts.vendor) {
+    return this.searchEuvdOnce(opts);
   }
+
+  const byVendor = await this.searchEuvdOnce(opts);
+  const byText = await this.searchEuvdOnce({ ...opts, vendor: undefined, text: opts.vendor });
+
+  const seen = new Set<string>();
+  const results: VulnItem[] = [];
+  for (const item of [...byVendor, ...byText]) {
+    const key = item.euvdId ?? item.id;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    results.push(item);
+  }
+
+  return results.slice(0, opts.size ?? 20);
+}
 
   async nvdCvss(cveId: string): Promise<{
     cveId: string;
